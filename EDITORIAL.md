@@ -90,7 +90,7 @@
 
 ## 7. 데이터 형식
 
-`data/issues/2026-10-26.json`이 기준 예시다. 키 구성을 그대로 따른다.
+`data/issues/2026-10-25.json`(시범판 0호)이 기준 예시다. 키 구성을 그대로 따른다.
 
 ```
 date, weekday, vol(직전 호 +1), label(정규 호는 ""), readMin, headline, note(선택),
