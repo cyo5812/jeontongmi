@@ -10,25 +10,25 @@ jobs:
       DOMAIN: jeontongmi.kro.kr
     steps:
       - name: "DNS: CNAME이 cyo5812.github.io를 가리킴"
-        continue-on-error: true
+        if: always()
         run: |
           dig +short CNAME "$DOMAIN"; dig +short A "$DOMAIN"
           dig +short CNAME "$DOMAIN" | grep -qi 'cyo5812.github.io'
       - name: "DNS: A 레코드가 GitHub Pages IP로 해석됨"
-        continue-on-error: true
+        if: always()
         run: dig +short A "$DOMAIN" | grep -qE '^185\.199\.(108|109|110|111)\.153$'
       - name: "HTTP: http:// 접속 응답"
-        continue-on-error: true
+        if: always()
         run: curl -sS -o /dev/null -w '%{http_code} -> %{redirect_url}\n' "http://$DOMAIN/" | tee /dev/stderr | grep -qE '^(200|301|308)'
       - name: "HTTPS: 유효한 인증서로 200 응답"
-        continue-on-error: true
+        if: always()
         run: curl -sS -o /dev/null -w '%{http_code}\n' "https://$DOMAIN/" | grep -q '^200'
       - name: "내용: 전.통.미. 페이지가 맞음"
-        continue-on-error: true
+        if: always()
         run: curl -sSL "https://$DOMAIN/" | grep -q '전<i>.</i>통<i>.</i>미'
       - name: "데이터: data/index.json 로드"
-        continue-on-error: true
+        if: always()
         run: curl -sSL "https://$DOMAIN/data/index.json" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d['issues']), 'issues'); assert d['issues']"
       - name: "옛 주소: github.io가 새 도메인으로 이동"
-        continue-on-error: true
+        if: always()
         run: curl -sS -o /dev/null -w '%{http_code} -> %{redirect_url}\n' "https://cyo5812.github.io/jeontongmi/" | tee /dev/stderr | grep -q "$DOMAIN"
