@@ -1,0 +1,35 @@
+name: 시장 데이터 수집
+
+on:
+  schedule:
+    - cron: "7 21 * * *"   # 매일 06:07 KST (UTC 21:07). 아침 발행 세션보다 먼저 돈다.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 주가·박스오피스·공시 수집
+        env:
+          KOBIS_KEY: ${{ secrets.KOBIS_KEY }}
+          DART_KEY: ${{ secrets.DART_KEY }}
+        run: python3 scripts/fetch_market.py
+      - name: 변경분 커밋
+        run: |
+          git config user.name "jeontongmi-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/market.json
+          if git diff --cached --quiet; then echo "변경 없음"; exit 0; fi
+          git commit -m "data: 시장 데이터 $(TZ=Asia/Seoul date +%Y-%m-%d)"
+          for i in 1 2 3; do git pull --rebase origin main && git push && break; sleep 5; done
