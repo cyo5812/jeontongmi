@@ -7,6 +7,8 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": 
 // [[key|표시어]] → 용어 툴팁
 const rich = s => esc(s).replace(/\[\[([a-z0-9_-]+)\|([^\]]+)\]\]/g, (m, k, t) =>
   GLOSS[k] ? `<span class="term" tabindex="0" data-def="${esc(GLOSS[k])}">${t}</span>` : t);
+// 의미 단위 줄바꿈: 쉼표·마침표 뒤에서만 줄이 바뀌도록 구절을 묶는다. 구절이 줄에 다 안 들어가면 통째로 다음 줄로 넘어간다.
+const seg = s => String(s ?? "").split(/(?<=[,.!?]) +/).map(p => `<span class="seg">${rich(p)}</span>`).join(" ");
 const fmt = (v, d = 0) => Number(v).toLocaleString("ko-KR", { minimumFractionDigits: d, maximumFractionDigits: d });
 const safeUrl = u => /^https?:\/\//.test(u) ? esc(u) : "#";
 
@@ -90,10 +92,10 @@ function figure(f, inLead) {
 function brief(b, id) {
   return `<article class="brief" id="${id}">
     ${chips(b)}
-    <h3>${esc(b.title)}</h3>
+    <h3>${seg(b.title)}</h3>
     <p>${rich(b.body)}</p>
     ${b.why ? `<p class="why"><b>왜 중요한가</b>${rich(b.why)}</p>` : ""}
-    ${b.krline ? `<div class="krline"><b>한국 시사점</b><span>${rich(b.krline)}</span></div>` : ""}
+    ${b.krline ? `<div class="krline"><b>한국 시사점</b><span>${seg(b.krline)}</span></div>` : ""}
     ${srcs(b.src)}
   </article>`;
 }
@@ -130,7 +132,7 @@ function renderIssue(d, market) {
   document.title = `전.통.미. · ${dt}`;
   return `
   <div class="edition">
-    <h1>${esc(d.headline)}</h1>
+    <h1>${seg(d.headline)}</h1>
     <div class="meta"><span class="num">${dt} (${esc(d.weekday)})</span><span>${d.label ? esc(d.label) + " " : ""}${esc(d.vol)}호</span><span>${esc(d.readMin)}분 읽기</span></div>
   </div>
   ${d.note ? `<p class="issue-note">${esc(d.note)}</p>` : ""}
@@ -138,8 +140,8 @@ function renderIssue(d, market) {
   <section class="brief60" aria-label="60초 브리핑">
     <div class="label">60초 브리핑</div>
     <div>
-      <ol>${d.brief60.map(t => `<li><span>${rich(t)}</span></li>`).join("")}</ol>
-      ${d.lens ? `<p class="lens"><b>오늘의 관점</b>${rich(d.lens)}</p>` : ""}
+      <ol>${d.brief60.map(t => `<li><span>${seg(t)}</span></li>`).join("")}</ol>
+      ${d.lens ? `<p class="lens"><b>오늘의 관점</b>${seg(d.lens)}</p>` : ""}
     </div>
   </section>
 
@@ -148,16 +150,16 @@ function renderIssue(d, market) {
       <article class="lead" id="lead">
         <div class="section-head"><h2>리드 스토리</h2><p>오늘 가장 깊게 볼 이슈</p></div>
         ${chips(L)}
-        <h3>${esc(L.title)}</h3>
-        <p class="dek">${rich(L.dek)}</p>
+        <h3>${seg(L.title)}</h3>
+        <p class="dek">${seg(L.dek)}</p>
         <h4><span class="label">FACT</span>무슨 일이 있나</h4>
         <ul>${L.what.map(t => `<li>${rich(t)}</li>`).join("")}</ul>
         ${figure(L.figure, true)}
         <h4><span class="label">WHY</span>왜 중요한가</h4>
         <p>${rich(L.why)}</p>
-        ${L.planner && L.planner.length ? `<div class="planner"><span class="label">내가 전략기획자라면</span><ol>${L.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${rich(b)}</span></li>`).join("")}</ol></div>` : ""}
+        ${L.planner && L.planner.length ? `<div class="planner"><span class="label">내가 전략기획자라면</span><ol>${L.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${seg(b)}</span></li>`).join("")}</ol></div>` : ""}
         <h4><span class="label">WATCH</span>지켜볼 것</h4>
-        <p>${rich(L.watch)}</p>
+        <p class="watch">${seg(L.watch)}</p>
         ${srcs(L.src)}
       </article>
       ${section("kr", "국내 브리핑", `${(d.kr || []).length}건`, d.kr, "k")}

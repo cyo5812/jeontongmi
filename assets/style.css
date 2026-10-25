@@ -1,7 +1,7 @@
 /* Layout: 신문형 단일 칼럼 본문 + 데스크톱 우측 레일(목차·시장·일정). 모바일은 60초 브리핑이 첫 화면. */
 /* Color: 옅은 블루그레이 종이 + 남색 잉크. 메인은 차분한 딥블루(글자용), 하늘색은 점·번호·선에만 쓰는 포인트. */
 :root{
-  --bg:#f3f6f9; --fg:#1c2733; --sub:#485566; --muted:#626e7f; --line:#d7dfe8; --soft:#e7edf3;
+  --bg:#f8fafc; --fg:#1c2733; --sub:#485566; --muted:#626e7f; --line:#dce3ea; --soft:#edf1f6;
   --accent:#2b5c95; --sky:#4b9cd6; --accent-soft:#e0ebf6; --accent-3:#b7d1ea; --ink-strong:#1d3a5f;
   --kr:#ad4d37; --kr-soft:#f5e8e3; --up:#bd4430; --down:#2b6cb0;
   --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Noto Sans KR",sans-serif;
@@ -29,6 +29,12 @@ a:focus-visible,button:focus-visible,select:focus-visible,.term:focus-visible{ou
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .label{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
 h1,h2,h3{text-wrap:balance;letter-spacing:-.02em}
+/* 의미 단위 줄바꿈(seg): 구절 하나는 한 덩어리로 다음 줄로 넘어간다 */
+.seg{display:inline-block;max-width:100%;text-wrap:balance}
+/* 긴 본문 단락은 양쪽 맞춤. 좁은 화면에서는 단어 사이가 벌어져서 왼쪽 정렬로 둔다 */
+@media (min-width:640px){
+  .lead ul li,.lead p:not(.dek):not(.watch),.brief p,.fig .cap,.issue-note,footer p{text-align:justify;text-justify:inter-word}
+}
 
 /* masthead */
 .mast{border-bottom:1px solid var(--line)}
