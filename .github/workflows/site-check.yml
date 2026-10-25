@@ -32,3 +32,16 @@ jobs:
       - name: "옛 주소: github.io가 새 도메인으로 이동"
         if: always()
         run: curl -sS -o /dev/null -w '%{http_code} -> %{redirect_url}\n' "https://cyo5812.github.io/jeontongmi/" | tee /dev/stderr | grep -q "$DOMAIN"
+      - name: "공유 링크: 새 도메인 ?d=날짜 주소가 200"
+        if: always()
+        run: |
+          D=$(curl -sSL "https://$DOMAIN/data/index.json" | python3 -c "import json,sys; print(json.load(sys.stdin)['issues'][0]['date'])")
+          curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' -L "https://$DOMAIN/?d=$D" | tee /dev/stderr | grep -q '^200'
+      - name: "공유 링크: 옛 주소 ?d=날짜가 새 도메인으로 이동해 200"
+        if: always()
+        run: |
+          curl -sS -o /dev/null -w '%{http_code} %{url_effective}\n' -L "https://cyo5812.github.io/jeontongmi/?d=2026-10-25" | tee /dev/stderr | grep -q "^200 https://$DOMAIN/"
+      - name: "공유 링크: 저장소 이름 없는 github.io 주소는 404"
+        if: always()
+        run: |
+          curl -sS -o /dev/null -w '%{http_code}\n' "https://cyo5812.github.io/?d=2026-10-25" | tee /dev/stderr | grep -q '^404'
