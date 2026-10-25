@@ -45,3 +45,12 @@ jobs:
         if: always()
         run: |
           curl -sS -o /dev/null -w '%{http_code}\n' "https://cyo5812.github.io/?d=2026-10-25" | tee /dev/stderr | grep -q '^404'
+      - name: "인증서: CAA 레코드가 Let's Encrypt 발급을 막지 않음"
+        if: always()
+        run: |
+          for h in "$DOMAIN" kro.kr; do echo "$h: $(dig +short CAA $h | tr '\n' ' ')"; done
+          C=$(dig +short CAA "$DOMAIN"; dig +short CAA kro.kr)
+          [ -z "$C" ] || echo "$C" | grep -qi letsencrypt
+      - name: "인증서: 443 포트가 이 도메인 인증서를 내줌"
+        if: always()
+        run: echo | openssl s_client -connect "$DOMAIN:443" -servername "$DOMAIN" 2>/dev/null | openssl x509 -noout -subject -ext subjectAltName | tee /dev/stderr | grep -q "$DOMAIN"
