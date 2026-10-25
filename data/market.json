@@ -1,6 +1,151 @@
 {
-  "updated": null,
-  "groups": [],
-  "boxoffice": null,
-  "disclosures": []
+ "updated": "10.25 21:46",
+ "groups": [
+  {
+   "name": "국내 · 전자",
+   "rows": [
+    {
+     "name": "삼성전자",
+     "ticker": "005930.KS",
+     "close": 215500.0,
+     "chg": 0.47,
+     "cur": "KRW"
+    },
+    {
+     "name": "LG전자",
+     "ticker": "066570.KS",
+     "close": 157100.0,
+     "chg": -1.81,
+     "cur": "KRW"
+    }
+   ]
+  },
+  {
+   "name": "국내 · 통신",
+   "rows": [
+    {
+     "name": "SK텔레콤",
+     "ticker": "017670.KS",
+     "close": 74500.0,
+     "chg": -2.23,
+     "cur": "KRW"
+    },
+    {
+     "name": "KT",
+     "ticker": "030200.KS",
+     "close": 46800.0,
+     "chg": -1.58,
+     "cur": "KRW"
+    },
+    {
+     "name": "LG유플러스",
+     "ticker": "032640.KS",
+     "close": 14160.0,
+     "chg": -1.87,
+     "cur": "KRW"
+    }
+   ]
+  },
+  {
+   "name": "국내 · 미디어·플랫폼",
+   "rows": [
+    {
+     "name": "CJ ENM",
+     "ticker": "035760.KQ",
+     "close": 40550.0,
+     "chg": 0.12,
+     "cur": "KRW"
+    },
+    {
+     "name": "스튜디오드래곤",
+     "ticker": "253450.KQ",
+     "close": 23350.0,
+     "chg": -0.85,
+     "cur": "KRW"
+    },
+    {
+     "name": "NAVER",
+     "ticker": "035420.KS",
+     "close": 173600.0,
+     "chg": -1.59,
+     "cur": "KRW"
+    },
+    {
+     "name": "카카오",
+     "ticker": "035720.KS",
+     "close": 29950.0,
+     "chg": -1.32,
+     "cur": "KRW"
+    }
+   ]
+  },
+  {
+   "name": "국내 · 엔터",
+   "rows": [
+    {
+     "name": "하이브",
+     "ticker": "352820.KS",
+     "close": 176500.0,
+     "chg": -0.4,
+     "cur": "KRW"
+    },
+    {
+     "name": "JYP Ent.",
+     "ticker": "035900.KQ",
+     "close": 36850.0,
+     "chg": -3.28,
+     "cur": "KRW"
+    },
+    {
+     "name": "에스엠",
+     "ticker": "041510.KQ",
+     "close": 82900.0,
+     "chg": -2.59,
+     "cur": "KRW"
+    },
+    {
+     "name": "YG엔터",
+     "ticker": "122870.KQ",
+     "close": 40750.0,
+     "chg": -1.69,
+     "cur": "KRW"
+    }
+   ]
+  },
+  {
+   "name": "해외",
+   "rows": [
+    {
+     "name": "Netflix",
+     "ticker": "NFLX",
+     "close": 65.85,
+     "chg": -1.79,
+     "cur": "USD"
+    },
+    {
+     "name": "Spotify",
+     "ticker": "SPOT",
+     "close": 584.22,
+     "chg": 0.1,
+     "cur": "USD"
+    },
+    {
+     "name": "Disney",
+     "ticker": "DIS",
+     "close": 112.52,
+     "chg": -0.54,
+     "cur": "USD"
+    },
+    {
+     "name": "Sony",
+     "ticker": "SONY",
+     "close": 26.08,
+     "chg": -0.46,
+     "cur": "USD"
+    }
+   ]
+  }
+ ],
+ "boxoffice": null,
+ "disclosures": []
 }
