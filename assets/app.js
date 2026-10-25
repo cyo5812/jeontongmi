@@ -88,6 +88,29 @@ function figure(f, inLead) {
   </div>`;
 }
 
+/* ---------- 공유 ---------- */
+let CURRENT = "";
+const SHARE_ICON = `<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M8 11.5 12 7.5M7 6.5l1.5-1.5a3.2 3.2 0 0 1 4.5 4.5L11.5 11M13 13.5 11.5 15a3.2 3.2 0 0 1-4.5-4.5L8.5 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+const shareBtn = (id, title, label = "링크 공유") =>
+  `<button type="button" class="share" data-share="${id}" data-title="${esc(title)}">${SHARE_ICON}<span>${label}</span></button>`;
+const shareUrl = id => `${location.origin}${location.pathname}?d=${CURRENT}${id ? "#" + id : ""}`;
+
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
+}
+async function share(btn) {
+  const url = shareUrl(btn.dataset.share), title = `${btn.dataset.title} · 전.통.미.`;
+  // 휴대폰은 기기 공유창(카카오톡·메시지 등), 그 외에는 링크 복사
+  if (navigator.share && matchMedia("(pointer:coarse)").matches) {
+    try { await navigator.share({ title, url }); return; } catch (e) { if (e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(url); toast("링크를 복사했어요"); }
+  catch (e) { toast(url); }
+}
+
 /* ---------- sections ---------- */
 function brief(b, id) {
   return `<article class="brief" id="${id}">
@@ -96,7 +119,7 @@ function brief(b, id) {
     <p>${rich(b.body)}</p>
     ${b.why ? `<p class="why"><b>왜 중요한가</b>${rich(b.why)}</p>` : ""}
     ${b.krline ? `<div class="krline"><b>한국 시사점</b><span>${seg(b.krline)}</span></div>` : ""}
-    ${srcs(b.src)}
+    <div class="foot">${srcs(b.src)}${shareBtn(id, b.title)}</div>
   </article>`;
 }
 
@@ -123,7 +146,7 @@ function marketPanel(m) {
   return h + `<p class="stamp">${esc(m.updated)} 기준 · 자동 수집</p></div>`;
 }
 
-function renderIssue(d, market) {
+function renderIssue(d, market, older, newer) {
   const L = d.lead;
   const toc = [["LEAD", "#lead", L.title]]
     .concat((d.kr || []).map((b, i) => ["국내", "#k" + i, b.title]))
@@ -133,8 +156,12 @@ function renderIssue(d, market) {
   return `
   <div class="edition">
     <h1>${seg(d.headline)}</h1>
-    <div class="meta"><span class="num">${dt} (${esc(d.weekday)})</span><span>${d.label ? esc(d.label) + " " : ""}${esc(d.vol)}호</span><span>${esc(d.readMin)}분 읽기</span></div>
+    <div class="meta"><span class="num">${dt} (${esc(d.weekday)})</span><span>${d.label ? esc(d.label) + " " : ""}${esc(d.vol)}호</span><span>${esc(d.readMin)}분 읽기</span>${shareBtn("", d.headline, "이번 호 공유")}</div>
   </div>
+  <nav class="issue-nav" aria-label="호 이동">
+    ${older ? `<a href="?d=${esc(older.date)}" rel="prev"><span>← 이전 호</span><b class="num">${esc(older.date.replaceAll("-", "."))}</b></a>` : `<span class="off">첫 호입니다</span>`}
+    ${newer ? `<a href="?d=${esc(newer.date)}" rel="next" class="next"><span>다음 호 →</span><b class="num">${esc(newer.date.replaceAll("-", "."))}</b></a>` : `<span class="off next">최신 호입니다</span>`}
+  </nav>
   ${d.note ? `<p class="issue-note">${esc(d.note)}</p>` : ""}
 
   <section class="brief60" aria-label="60초 브리핑">
@@ -160,7 +187,7 @@ function renderIssue(d, market) {
         ${L.planner && L.planner.length ? `<div class="planner"><span class="label">내가 전략기획자라면</span><ol>${L.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${seg(b)}</span></li>`).join("")}</ol></div>` : ""}
         <h4><span class="label">WATCH</span>지켜볼 것</h4>
         <p class="watch">${seg(L.watch)}</p>
-        ${srcs(L.src)}
+        <div class="foot">${srcs(L.src)}${shareBtn("lead", L.title)}</div>
       </article>
       ${section("kr", "국내 브리핑", `${(d.kr || []).length}건`, d.kr, "k")}
       ${section("global", "글로벌 브리핑", `${(d.global || []).length}건 · 모두 한국 시사점 포함`, d.global, "g")}
@@ -199,8 +226,10 @@ async function main() {
     const pick = INDEX.find(e => e.date === want) || INDEX[0];
     if (!pick) { app.innerHTML = `<p class="loading">아직 발행된 호가 없습니다.</p>`; return; }
     const issue = await getJSON(`data/issues/${pick.date}.json`);
+    const at = INDEX.indexOf(pick); // INDEX는 최신순
+    CURRENT = pick.date;
     CW = Math.round(Math.max(320, Math.min(640, app.clientWidth)));
-    app.innerHTML = renderIssue(issue, pick === INDEX[0] ? market : null);
+    app.innerHTML = renderIssue(issue, pick === INDEX[0] ? market : null, INDEX[at + 1], INDEX[at - 1]);
     renderArchive(pick.date);
     if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
   } catch (e) {
@@ -227,7 +256,28 @@ function setFont(f) {
 }
 setFont(document.documentElement.dataset.font === "sandol" ? "sandol" : "plex");
 
+/* ---------- 화면 모드 (라이트 / 다크) ---------- */
+const darkQuery = matchMedia("(prefers-color-scheme: dark)");
+const isDark = () => (document.documentElement.dataset.theme || (darkQuery.matches ? "dark" : "light")) === "dark";
+function syncThemeButton() {
+  const b = document.getElementById("theme-toggle"), dark = isDark();
+  b.setAttribute("aria-label", dark ? "라이트 모드로 바꾸기" : "다크 모드로 바꾸기");
+  b.title = b.getAttribute("aria-label");
+  b.dataset.mode = dark ? "dark" : "light";
+}
+function toggleTheme() {
+  const next = isDark() ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try { localStorage.setItem("jtm-theme", next); } catch (e) { /* 저장이 막혀도 이번 화면에는 적용된다 */ }
+  syncThemeButton();
+}
+darkQuery.addEventListener("change", syncThemeButton);
+syncThemeButton();
+
 document.addEventListener("click", e => {
+  if (e.target.closest("#theme-toggle")) { toggleTheme(); return; }
+  const sb = e.target.closest("[data-share]");
+  if (sb) { share(sb); return; }
   const fb = e.target.closest(".fontswitch button");
   if (fb) { setFont(fb.dataset.font); return; }
   const b = e.target.closest("[data-f]");

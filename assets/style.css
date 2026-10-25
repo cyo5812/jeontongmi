@@ -187,3 +187,25 @@ footer p{margin:4px 0}
   .planner{padding:16px}
   .archive li a{grid-template-columns:minmax(0,1fr);gap:2px}
 }
+
+/* 화면 모드 버튼 */
+.theme-toggle{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--soft);color:var(--sub);cursor:pointer}
+.theme-toggle:hover{color:var(--accent)}
+.theme-toggle .i-sun{display:none}
+.theme-toggle[data-mode="dark"] .i-sun{display:block}
+.theme-toggle[data-mode="dark"] .i-moon{display:none}
+
+/* 공유 */
+.foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px}
+.share{display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:12.5px;font-weight:600;color:var(--accent);background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 11px;cursor:pointer}
+.share:hover{border-color:var(--sky);background:var(--accent-soft)}
+.edition .meta .share{margin-left:2px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;max-width:min(90vw,520px);overflow-wrap:anywhere;background:var(--fg);color:var(--bg);font-size:14px;padding:10px 16px;border-radius:8px;box-shadow:0 4px 16px rgba(10,20,40,.18)}
+
+/* 이전 / 다음 호 */
+.issue-nav{display:flex;justify-content:space-between;gap:12px;padding-block:10px;border-bottom:1px solid var(--line);font-size:13.5px}
+.issue-nav a,.issue-nav .off{display:flex;flex-direction:column;gap:0;text-decoration:none;color:var(--sub);line-height:1.4}
+.issue-nav a:hover{color:var(--accent)}
+.issue-nav b{font-size:12px;font-weight:600;color:var(--accent)}
+.issue-nav .next{text-align:right;margin-left:auto}
+.issue-nav .off{color:var(--muted);font-size:12.5px;justify-content:center}

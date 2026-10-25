@@ -5,15 +5,26 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>전.통.미.</title>
 <meta name="description" content="전자·통신·미디어, 연결된 고리를 읽는 아침 브리프. 매일 오전 7시 30분 발행.">
-<meta property="og:title" content="전.통.미.">
-<meta property="og:description" content="전자·통신·미디어, 연결된 고리를 읽는 아침 브리프">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="전.통.미.">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:url" content="https://jeontongmi.kro.kr/">
+<meta property="og:title" content="전.통.미. · 전자·통신·미디어 아침 브리프">
+<meta property="og:description" content="전자·통신·미디어, 연결된 고리를 읽는 아침. 매일 오전 7시 30분, 한국 산업 관점으로 정리한 뉴스와 데이터.">
+<meta property="og:image" content="https://jeontongmi.kro.kr/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="전.통.미. 전자·통신·미디어, 연결된 고리를 읽는 아침">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://jeontongmi.kro.kr/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232b5c95'/%3E%3Ctext x='16' y='22' font-size='16' font-weight='700' text-anchor='middle' fill='white' font-family='sans-serif'%3E%EC%A0%84%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css">
 <script>
-// 글꼴 모드: 화면이 그려지기 전에 적용해 깜빡임을 막는다
+// 글꼴·화면 모드: 화면이 그려지기 전에 적용해 깜빡임을 막는다
+(function(){try{var t=localStorage.getItem("jtm-theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}})();
 (function(){var f="plex";try{f=localStorage.getItem("jtm-font")||"plex"}catch(e){}
 if(f==="sandol"){document.documentElement.dataset.font="sandol";
 var l=document.createElement("link");l.rel="stylesheet";l.id="pretendard";
@@ -34,6 +45,10 @@ document.head.appendChild(l)}})();
       <button type="button" id="font-plex" data-font="plex" aria-pressed="true" title="IBM Plex Sans KR">Plex</button>
       <button type="button" id="font-sandol" data-font="sandol" aria-pressed="false" title="Apple SD 산돌고딕 Neo (애플 기기 외에는 Pretendard)">산돌</button>
     </div>
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="다크 모드로 바꾸기">
+      <svg class="i-moon" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M15.5 12.6A6.5 6.5 0 0 1 7.4 4.5a6.5 6.5 0 1 0 8.1 8.1Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <svg class="i-sun" viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><circle cx="10" cy="10" r="3.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.5v1.8M10 15.7v1.8M2.5 10h1.8M15.7 10h1.8M4.7 4.7l1.3 1.3M14 14l1.3 1.3M4.7 15.3 6 14M14 6l1.3-1.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
   </div>
 </div></header>
 
@@ -55,6 +70,7 @@ document.head.appendChild(l)}})();
   </div>
 </div></footer>
 <div id="tip" hidden></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
 <script src="assets/app.js"></script>
 </body>
 </html>
