@@ -1,5 +1,5 @@
 {
- "updated": "10.25 21:46",
+ "updated": "10.25 23:42",
  "groups": [
   {
    "name": "국내 · 전자",
@@ -9,6 +9,13 @@
      "ticker": "005930.KS",
      "close": 215500.0,
      "chg": 0.47,
+     "cur": "KRW"
+    },
+    {
+     "name": "SK하이닉스",
+     "ticker": "000660.KS",
+     "close": 1277000.0,
+     "chg": 4.42,
      "cur": "KRW"
     },
     {
@@ -146,6 +153,83 @@
    ]
   }
  ],
- "boxoffice": null,
- "disclosures": []
+ "boxoffice": {
+  "date": "10.24",
+  "items": [
+   {
+    "rank": 1,
+    "name": "극장판 치이카와: 인어 섬의 비밀",
+    "audi": 145106,
+    "acc": 2112684
+   },
+   {
+    "rank": 2,
+    "name": "암살자(들)",
+    "audi": 28692,
+    "acc": 3348403
+   },
+   {
+    "rank": 3,
+    "name": "실낙원",
+    "audi": 27914,
+    "acc": 82565
+   },
+   {
+    "rank": 4,
+    "name": "클레이페이스",
+    "audi": 20230,
+    "acc": 61177
+   },
+   {
+    "rank": 5,
+    "name": "타짜: 벨제붑의 노래",
+    "audi": 19775,
+    "acc": 1982705
+   },
+   {
+    "rank": 6,
+    "name": "여전히 찬란하게",
+    "audi": 8997,
+    "acc": 33948
+   },
+   {
+    "rank": 7,
+    "name": "오디세이",
+    "audi": 8088,
+    "acc": 12303703
+   },
+   {
+    "rank": 8,
+    "name": "룩백",
+    "audi": 7283,
+    "acc": 126056
+   },
+   {
+    "rank": 9,
+    "name": "베러티",
+    "audi": 5865,
+    "acc": 20884
+   },
+   {
+    "rank": 10,
+    "name": "킬링타임",
+    "audi": 4532,
+    "acc": 15034
+   }
+  ]
+ },
+ "disclosures": [
+  {
+   "date": "20261023",
+   "corp": "KT",
+   "title": "조회공시요구(풍문또는보도)에대한답변(미확정)",
+   "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261023800988"
+  },
+  {
+   "date": "20261023",
+   "corp": "KT",
+   "title": "소송등의제기ㆍ신청(일정금액이상의청구)",
+   "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261023800986"
+  }
+ ]
 }
