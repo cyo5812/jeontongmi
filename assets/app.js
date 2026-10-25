@@ -211,7 +211,7 @@ function renderArchive(current) {
   document.getElementById("archive-list").innerHTML = list.length ? list.map(e => `
     <li><a href="?d=${esc(e.date)}"${e.date === current ? ' aria-current="page"' : ""}>
       <span class="num">${esc(e.date.replaceAll("-", "."))}</span>
-      <span><h3>${esc(e.headline)}</h3><p>${esc((e.titles || []).slice(0, 3).join(" · "))}</p></span>
+      <span><h3>${esc(e.headline)}</h3></span>
     </a></li>`).join("") : `<li class="empty">이 분야를 다룬 호가 아직 없습니다.</li>`;
 }
 

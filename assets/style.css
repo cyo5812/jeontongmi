@@ -33,7 +33,7 @@ h1,h2,h3{text-wrap:balance;letter-spacing:-.02em}
 .seg{display:inline-block;max-width:100%;text-wrap:balance}
 /* 긴 본문 단락은 양쪽 맞춤. 좁은 화면에서는 단어 사이가 벌어져서 왼쪽 정렬로 둔다 */
 @media (min-width:640px){
-  .lead ul li,.lead p:not(.dek):not(.watch),.brief p,.fig .cap,.issue-note,footer p{text-align:justify;text-justify:inter-word}
+  .lead ul li,.lead p:not(.dek):not(.watch),.brief p,.fig .cap,.issue-note{text-align:justify;text-justify:inter-word}
 }
 
 /* masthead */
