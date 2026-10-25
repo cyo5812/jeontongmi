@@ -7,11 +7,19 @@
 <meta name="description" content="전자·통신·미디어, 연결된 고리를 읽는 아침 브리프. 매일 오전 7시 30분 발행.">
 <meta property="og:title" content="전.통.미.">
 <meta property="og:description" content="전자·통신·미디어, 연결된 고리를 읽는 아침 브리프">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231747d6'/%3E%3Ctext x='16' y='22' font-size='16' font-weight='700' text-anchor='middle' fill='white' font-family='sans-serif'%3E%EC%A0%84%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232b5c95'/%3E%3Ctext x='16' y='22' font-size='16' font-weight='700' text-anchor='middle' fill='white' font-family='sans-serif'%3E%EC%A0%84%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="assets/style.css">
+<script>
+// 글꼴 모드: 화면이 그려지기 전에 적용해 깜빡임을 막는다
+(function(){var f="plex";try{f=localStorage.getItem("jtm-font")||"plex"}catch(e){}
+if(f==="sandol"){document.documentElement.dataset.font="sandol";
+var l=document.createElement("link");l.rel="stylesheet";l.id="pretendard";
+l.href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css";
+document.head.appendChild(l)}})();
+</script>
 </head>
 <body>
 <header class="mast"><div class="wrap">
@@ -20,7 +28,13 @@
     <span class="season">SEASON 2</span>
     <span class="tagline">전자·통신·미디어, 연결된 고리를 읽는 아침</span>
   </a>
-  <nav><a href="#lead">리드</a><a href="#kr">국내</a><a href="#global">글로벌</a><a href="#numbers">숫자</a><a href="#archive">지난 호</a></nav>
+  <div class="mast-right">
+    <nav><a href="#lead">리드</a><a href="#kr">국내</a><a href="#global">글로벌</a><a href="#numbers">숫자</a><a href="#archive">지난 호</a></nav>
+    <div class="fontswitch" role="group" aria-label="글꼴 선택">
+      <button type="button" id="font-plex" data-font="plex" aria-pressed="true" title="IBM Plex Sans KR">Plex</button>
+      <button type="button" id="font-sandol" data-font="sandol" aria-pressed="false" title="Apple SD 산돌고딕 Neo (애플 기기 외에는 Pretendard)">산돌</button>
+    </div>
+  </div>
 </div></header>
 
 <main class="wrap" id="app"><p class="loading">오늘의 브리프를 불러오는 중입니다.</p></main>

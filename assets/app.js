@@ -206,7 +206,28 @@ async function main() {
   }
 }
 
+/* ---------- 글꼴 모드 (Plex / 산돌) ---------- */
+const PRETENDARD = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css";
+function setFont(f) {
+  const root = document.documentElement;
+  if (f === "sandol") {
+    root.dataset.font = "sandol";
+    if (!document.getElementById("pretendard")) {
+      const l = document.createElement("link");
+      l.rel = "stylesheet"; l.id = "pretendard"; l.href = PRETENDARD;
+      document.head.appendChild(l);
+    }
+  } else {
+    delete root.dataset.font;
+  }
+  document.querySelectorAll(".fontswitch button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.font === f)));
+  try { localStorage.setItem("jtm-font", f); } catch (e) { /* 저장이 막혀도 이번 화면에는 적용된다 */ }
+}
+setFont(document.documentElement.dataset.font === "sandol" ? "sandol" : "plex");
+
 document.addEventListener("click", e => {
+  const fb = e.target.closest(".fontswitch button");
+  if (fb) { setFont(fb.dataset.font); return; }
   const b = e.target.closest("[data-f]");
   if (b) { FILTER = b.dataset.f; renderArchive(new URLSearchParams(location.search).get("d")); }
 });
