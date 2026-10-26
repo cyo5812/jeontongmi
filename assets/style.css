@@ -89,6 +89,8 @@ h1,h2,h3{text-wrap:balance;letter-spacing:-.02em}
 
 /* lead */
 .lead{padding-top:30px}
+/* 섹션 제목줄~태그 간격: 국내·글로벌 브리핑과 같은 30px로 맞춤 (제목줄 아래 6px 여백과 겹쳐 합쳐지므로 30px 그대로 지정) */
+.lead > .section-head + .chips{margin-top:30px}
 .lead > h3{font-size:clamp(25px,3vw,34px);line-height:1.38;margin:12px 0 16px}
 .lead .dek{font-size:18px;line-height:1.75;color:var(--sub);margin:0 0 26px}
 .lead h4{font-size:15px;margin:30px 0 8px;display:flex;gap:10px;align-items:baseline}
