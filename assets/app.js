@@ -112,20 +112,20 @@ async function share(btn) {
 }
 
 /* ---------- sections ---------- */
-function brief(b, id) {
+function brief(b, id, kl = "한국 시사점") {
   return `<article class="brief" id="${id}">
     ${chips(b)}
     <h3>${seg(b.title)}</h3>
     <p>${rich(b.body)}</p>
     ${b.why ? `<p class="why"><b>왜 중요한가</b>${rich(b.why)}</p>` : ""}
-    ${b.krline ? `<div class="krline"><b>한국 시사점</b><span>${seg(b.krline)}</span></div>` : ""}
+    ${b.krline ? `<div class="krline"><b>${kl}</b><span>${seg(b.krline)}</span></div>` : ""}
     <div class="foot">${srcs(b.src)}${shareBtn(id, b.title)}</div>
   </article>`;
 }
 
-function section(id, title, sub, items, prefix) {
+function section(id, title, sub, items, prefix, kl) {
   if (!items || !items.length) return "";
-  return `<section id="${id}"><div class="section-head"><h2>${title}</h2><p>${sub}</p></div>${items.map((b, i) => brief(b, prefix + i)).join("")}</section>`;
+  return `<section id="${id}"><div class="section-head"><h2>${title}</h2><p>${sub}</p></div>${items.map((b, i) => brief(b, prefix + i, kl)).join("")}</section>`;
 }
 
 function marketPanel(m) {
@@ -189,7 +189,7 @@ function renderIssue(d, market, older, newer) {
         <p class="watch">${seg(L.watch)}</p>
         <div class="foot">${srcs(L.src)}${shareBtn("lead", L.title)}</div>
       </article>
-      ${section("kr", "국내 브리핑", `${(d.kr || []).length}건`, d.kr, "k")}
+      ${section("kr", "국내 브리핑", `${(d.kr || []).length}건`, d.kr, "k", "산업 시사점")}
       ${section("global", "글로벌 브리핑", `${(d.global || []).length}건 · 모두 한국 시사점 포함`, d.global, "g")}
       ${d.figures && d.figures.length ? `<section id="numbers"><div class="section-head"><h2>숫자로 보는 산업</h2><p>오늘 기사 속 수치를 한눈에</p></div>${d.figures.map(f => figure(f)).join("")}</section>` : ""}
     </div>
