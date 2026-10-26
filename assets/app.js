@@ -162,7 +162,7 @@ function renderIssue(d, market, older, newer) {
     ${older ? `<a href="?d=${esc(older.date)}" rel="prev"><span>← 이전 호</span><b class="num">${esc(older.date.replaceAll("-", "."))}</b></a>` : `<span class="off">첫 호입니다</span>`}
     ${newer ? `<a href="?d=${esc(newer.date)}" rel="next" class="next"><span>다음 호 →</span><b class="num">${esc(newer.date.replaceAll("-", "."))}</b></a>` : `<span class="off next">최신 호입니다</span>`}
   </nav>
-  ${d.note ? `<p class="issue-note">${esc(d.note)}</p>` : ""}
+  ${d.note ? `<p class="issue-note">${String(d.note).split(/(?<=[.!?])\s+/).map(t => `<span class="line">${esc(t)}</span>`).join("")}</p>` : ""}
 
   <section class="brief60" aria-label="60초 브리핑">
     <div class="label">60초 브리핑</div>
