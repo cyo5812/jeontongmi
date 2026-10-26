@@ -146,6 +146,20 @@ function marketPanel(m) {
   return h + `<p class="stamp">${esc(m.updated)} 기준 · 자동 수집</p></div>`;
 }
 
+/* 일정 날짜: "MM.DD"로 시작하면 요일을 코드가 직접 계산해 붙인다(데이터에 적힌 요일은 무시).
+   날짜+요일은 한 덩어리로 묶어 줄바꿈되지 않게 하고, 시각 등 나머지는 다음 줄에 둔다. */
+const WD = "일월화수목금토";
+function calWhen(w, issueDate) {
+  const m = String(w ?? "").trim().match(/^(\d{1,2})\.(\d{1,2})\s*(?:\([^)]*\))?\s*(.*)$/);
+  if (!m) return `<span class="when">${esc(w)}</span>`;
+  const [y0, m0] = issueDate.split("-").map(Number);
+  const mo = +m[1], da = +m[2], y = mo < m0 ? y0 + 1 : y0; // 발행월보다 앞선 달이면 다음 해
+  const day = new Date(y, mo - 1, da);
+  const wd = day.getMonth() === mo - 1 ? `(${WD[day.getDay()]})` : "";
+  const md = `${String(mo).padStart(2, "0")}.${String(da).padStart(2, "0")}`;
+  return `<span class="when"><span class="nb">${md}${wd}</span>${m[3] ? `<small>${esc(m[3])}</small>` : ""}</span>`;
+}
+
 function renderIssue(d, market, older, newer) {
   const L = d.lead;
   const toc = [["LEAD", "#lead", L.title]]
@@ -196,7 +210,7 @@ function renderIssue(d, market, older, newer) {
     <aside class="rail">
       <nav class="toc" aria-label="이번 호 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav>
       ${marketPanel(market)}
-      ${d.calendar && d.calendar.length ? `<div class="cal"><h3>다가오는 일정</h3><ul>${d.calendar.map(([w, t, n]) => `<li><span class="num">${esc(w)}</span><span>${esc(t)}${n ? `<em>${esc(n)}</em>` : ""}</span></li>`).join("")}</ul></div>` : ""}
+      ${d.calendar && d.calendar.length ? `<div class="cal"><h3>다가오는 일정</h3><ul>${d.calendar.map(([w, t, n]) => `<li>${calWhen(w, d.date)}<span>${esc(t)}${n ? `<em>${esc(n)}</em>` : ""}</span></li>`).join("")}</ul></div>` : ""}
       <div class="gloss"><h3>용어 도움말</h3><p>점선 밑줄이 있는 용어에 마우스를 올리거나 탭하면 설명이 나옵니다.</p></div>
     </aside>
   </div>`;
