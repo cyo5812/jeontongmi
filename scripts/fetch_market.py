@@ -56,7 +56,8 @@ def _auto_mode(now):
 
 
 MODE = os.environ.get("MODE", "auto") or "auto"
-if MODE == "auto":
+# 요청 모드가 시각과 맞지 않으면(예: 오후에 개장가 요청) 시각 기준 모드를 따른다. 종가 요청은 그대로 둔다.
+if MODE == "auto" or (MODE in ("open", "intraday") and MODE != _auto_mode(dt.datetime.now(KST))):
     MODE = _auto_mode(dt.datetime.now(KST))
 
 
