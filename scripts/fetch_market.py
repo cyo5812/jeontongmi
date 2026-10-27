@@ -45,7 +45,19 @@ def get(url, timeout=20):
 
 
 WEEKDAY = "월화수목금토일"
-MODE = os.environ.get("MODE", "close")
+def _auto_mode(now):
+    """KST 시각으로 모드를 정한다: 12시 전 개장가, 12:00~15:39 장중, 그 외 종가."""
+    hm = now.hour * 100 + now.minute
+    if 900 <= hm < 1200:
+        return "open"
+    if 1200 <= hm < 1540:
+        return "intraday"
+    return "close"
+
+
+MODE = os.environ.get("MODE", "auto") or "auto"
+if MODE == "auto":
+    MODE = _auto_mode(dt.datetime.now(KST))
 
 
 def quote(sym):

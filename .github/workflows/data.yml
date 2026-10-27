@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "close(종가) / open(개장가) / intraday(현재가)"
-        default: close
+        description: "auto(KST 시각으로 자동) / close(종가) / open(개장가) / intraday(현재가)"
+        default: auto
 
 permissions:
   contents: write
@@ -31,12 +31,11 @@ jobs:
         env:
           KOBIS_KEY: ${{ secrets.KOBIS_KEY }}
           DART_KEY: ${{ secrets.DART_KEY }}
-          MODE: ${{ github.event.inputs.mode || 'close' }}
+          MODE: ${{ github.event.inputs.mode || 'auto' }}
         run: python3 scripts/fetch_market.py
       - name: 변경분 커밋
-        env:
-          MODE: ${{ github.event.inputs.mode || 'close' }}
         run: |
+          MODE=$(python3 -c "import json;print(json.load(open('data/market.json')).get('mode',''))")
           git config user.name "jeontongmi-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/market.json
