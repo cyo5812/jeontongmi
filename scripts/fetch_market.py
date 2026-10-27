@@ -60,6 +60,9 @@ def quote(sym):
         raise ValueError("not enough bars")
     mtime = dt.datetime.fromtimestamp(meta["regularMarketTime"], tz)
     session_end = dt.datetime.fromtimestamp(meta["currentTradingPeriod"]["regular"]["end"], tz)
+    # 최신 시세는 있는데 그날 일봉이 아직 안 올라온 경우(미국 종목에서 자주 생김): 최신 시세로 그날 봉을 채운다
+    if mtime.date() > bars[-1][0]:
+        bars.append((mtime.date(), None, meta["regularMarketPrice"]))
     today_bar = bars[-1][0] == mtime.date()
     prev_close = bars[-2][2] if today_bar else bars[-1][2]
     day = f"{mtime:%m.%d}({WEEKDAY[mtime.weekday()]})"
