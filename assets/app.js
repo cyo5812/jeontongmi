@@ -132,18 +132,18 @@ function marketPanel(m) {
   if (!m || !m.updated) return "";
   let h = `<div class="market"><h3>시장 · 데이터</h3>`;
   (m.groups || []).forEach(g => {
-    h += `<table><caption>${esc(g.name)}</caption><tbody>${g.rows.map(r => {
+    h += `<table><caption>${esc(g.name)}${g.basis ? `<span class="basis">${esc(g.basis)}</span>` : ""}</caption><tbody>${g.rows.map(r => {
       const c = Number(r.chg), cls = c > 0 ? "up" : c < 0 ? "down" : "";
       return `<tr><td>${esc(r.name)}</td><td>${fmt(r.close, r.cur === "USD" ? 2 : 0)}</td><td class="${cls}">${c > 0 ? "+" : ""}${c.toFixed(2)}%</td></tr>`;
     }).join("")}</tbody></table>`;
   });
   if (m.boxoffice && m.boxoffice.items && m.boxoffice.items.length) {
-    h += `<table><caption>박스오피스 · ${esc(m.boxoffice.date)}</caption><tbody>${m.boxoffice.items.slice(0, 5).map(b => `<tr><td>${esc(b.rank)}. ${esc(b.name)}</td><td>${fmt(b.audi)}</td><td>누적 ${fmt(Math.round(b.acc / 10000))}만</td></tr>`).join("")}</tbody></table>`;
+    h += `<table><caption>박스오피스<span class="basis">${esc(m.boxoffice.date)} 관객</span></caption><tbody>${m.boxoffice.items.slice(0, 5).map(b => `<tr><td>${esc(b.rank)}. ${esc(b.name)}</td><td>${fmt(b.audi)}</td><td>누적 ${fmt(Math.round(b.acc / 10000))}만</td></tr>`).join("")}</tbody></table>`;
   }
   if (m.disclosures && m.disclosures.length) {
     h += `<table><caption>주요 공시</caption><tbody>${m.disclosures.slice(0, 6).map(d => `<tr><td colspan="3"><a href="${safeUrl(d.url)}" target="_blank" rel="noopener">${esc(d.corp)} · ${esc(d.title)}</a></td></tr>`).join("")}</tbody></table>`;
   }
-  return h + `<p class="stamp">${esc(m.updated)} 기준 · 자동 수집</p></div>`;
+  return h + `<p class="stamp">등락률은 직전 거래일 종가 대비 · ${esc(m.updated)} 수집</p></div>`;
 }
 
 /* 일정 날짜: "MM.DD"로 시작하면 요일을 코드가 직접 계산해 붙인다(데이터에 적힌 요일은 무시).

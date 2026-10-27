@@ -14,7 +14,9 @@
 1. 저장소 최신본을 받는다: `git pull origin main`
 2. 오늘 날짜(KST)를 확인한다: `TZ=Asia/Seoul date +%F` 와 요일.
 3. `data/index.json`과 최근 3개 호(`data/issues/`)를 읽는다. 이미 다룬 사건, 이어지는 일정(calendar), 직전 호의 vol 번호를 확인한다.
-4. `data/market.json`을 읽는다(GitHub Actions가 06시 수집). `updated`가 오늘 날짜가 아니면 시장 수치를 본문에 인용하지 않는다.
+4. `data/market.json`을 읽는다(GitHub Actions가 매일 06:10 KST에 전일 종가를 수집). GitHub 예약 실행은 늦어질 때가 많으므로, `updated_at`이 오늘 06:00 KST 이전이면 직접 수집을 실행한다:
+   `gh workflow run data.yml -R cyo5812/jeontongmi -f mode=close` 후 `gh run watch`로 끝날 때까지(최대 5분) 기다리고 `git pull origin main` 한다. 실행이 안 되거나 5분 안에 끝나지 않으면 그냥 다음 단계로 넘어간다.
+   그래도 `updated_at`이 오늘이 아니면 시장 수치를 본문에 인용하지 않는다. 각 그룹의 `basis`(예: "10.24(금) 종가")를 확인하고, 인용할 때는 그 기준을 함께 쓴다.
 5. 뉴스를 검색한다(3장). 검색은 여러 개를 한 번에 병렬로 보낸다.
 6. 기사를 고르고(4장) `data/issues/YYYY-MM-DD.json`을 쓴다(5장, 6장).
 7. `python3 scripts/validate_issue.py`를 실행한다. 오류가 나면 고치고 다시 실행한다. 통과해야 `data/index.json`이 갱신된다.

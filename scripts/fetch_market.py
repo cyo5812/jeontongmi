@@ -4,6 +4,7 @@
 Runs in GitHub Actions (open internet). Each source is optional: if one fails or
 its API key is missing, the others are still written.
   - 주가: Yahoo Finance chart API (키 불필요)
+    env MODE: close(기본, 직전 종가) / open(오늘 개장가) / intraday(현재가, 지연 시세)
   - 박스오피스: KOBIS 일별 박스오피스 (env KOBIS_KEY)
   - 공시: OpenDART 공시검색 (env DART_KEY)
 """
@@ -43,14 +44,38 @@ def get(url, timeout=20):
         return json.loads(r.read().decode("utf-8"))
 
 
+WEEKDAY = "월화수목금토일"
+MODE = os.environ.get("MODE", "close")
+
+
 def quote(sym):
+    """가격과 '무엇 기준인지'를 함께 돌려준다. 등락률은 항상 직전 거래일 종가 대비."""
     url = f"https://query1.finance.yahoo.com/v8/finance/chart/{urllib.parse.quote(sym)}?range=5d&interval=1d"
     res = get(url)["chart"]["result"][0]
-    closes = [c for c in res["indicators"]["quote"][0]["close"] if c is not None]
-    if len(closes) < 2:
-        raise ValueError("not enough closes")
-    return {"close": round(closes[-1], 2), "chg": round((closes[-1] / closes[-2] - 1) * 100, 2),
-            "cur": res["meta"].get("currency", "")}
+    meta, q = res["meta"], res["indicators"]["quote"][0]
+    tz = dt.timezone(dt.timedelta(seconds=meta.get("gmtoffset", 0)))
+    bars = [(dt.datetime.fromtimestamp(t, tz).date(), o, c)
+            for t, o, c in zip(res["timestamp"], q["open"], q["close"]) if c is not None]
+    if len(bars) < 2:
+        raise ValueError("not enough bars")
+    mtime = dt.datetime.fromtimestamp(meta["regularMarketTime"], tz)
+    session_end = dt.datetime.fromtimestamp(meta["currentTradingPeriod"]["regular"]["end"], tz)
+    today_bar = bars[-1][0] == mtime.date()
+    prev_close = bars[-2][2] if today_bar else bars[-1][2]
+    day = f"{mtime:%m.%d}({WEEKDAY[mtime.weekday()]})"
+
+    # 장이 끝났거나, 아직 오늘 장이 열리지 않아 마지막 시세가 이전 거래일 것이면 → 종가
+    if not today_bar or mtime >= session_end or mtime.date() < session_end.date():
+        price = bars[-1][2]
+        prev_close = bars[-2][2]
+        d = bars[-1][0]
+        basis = f"{d:%m.%d}({WEEKDAY[d.weekday()]}) 종가"
+    elif MODE == "open" and bars[-1][1] is not None:  # 개장가
+        price, basis = bars[-1][1], f"{day} 개장가"
+    else:                                              # 장중 현재가(지연 시세)
+        price, basis = meta["regularMarketPrice"], f"{day} {mtime:%H:%M} 장중"
+    return {"close": round(price, 2), "chg": round((price / prev_close - 1) * 100, 2),
+            "cur": meta.get("currency", ""), "basis": basis}
 
 
 def stocks():
@@ -63,7 +88,9 @@ def stocks():
             except Exception as e:  # noqa: BLE001 - one bad ticker must not stop the run
                 print(f"  ! {sym}: {e}", file=sys.stderr)
         if out:
-            groups.append({"name": name, "rows": out})
+            # 그룹 기준 표시는 가장 많은 종목이 따르는 기준으로
+            basis = max({r["basis"] for r in out}, key=[r["basis"] for r in out].count)
+            groups.append({"name": name, "basis": basis, "rows": out})
     return groups
 
 
@@ -72,7 +99,10 @@ def boxoffice(key):
     url = ("https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?"
            + urllib.parse.urlencode({"key": key, "targetDt": day}))
     rows = get(url)["boxOfficeResult"]["dailyBoxOfficeList"]
-    return {"date": f"{day[4:6]}.{day[6:]}", "items": [
+    if not rows:
+        raise ValueError(f"{day} 박스오피스가 아직 집계되지 않음")
+    d = dt.date(int(day[:4]), int(day[4:6]), int(day[6:]))
+    return {"date": f"{day[4:6]}.{day[6:]}({WEEKDAY[d.weekday()]})", "items": [
         {"rank": int(r["rank"]), "name": r["movieNm"], "audi": int(r["audiCnt"]), "acc": int(r["audiAcc"])} for r in rows]}
 
 
@@ -104,7 +134,9 @@ def disclosures(key):
 def main():
     path = ROOT / "data" / "market.json"
     old = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
-    data = {"updated": dt.datetime.now(KST).strftime("%m.%d %H:%M"), "groups": [], "boxoffice": None, "disclosures": []}
+    now = dt.datetime.now(KST)
+    data = {"updated": now.strftime("%m.%d %H:%M"), "updated_at": now.isoformat(timespec="minutes"),
+            "groups": [], "boxoffice": None, "disclosures": []}
 
     try:
         data["groups"] = stocks()
@@ -121,9 +153,12 @@ def main():
         except Exception as e:  # noqa: BLE001
             print(f"dart failed: {e}", file=sys.stderr)
 
-    if not data["groups"] and not data["boxoffice"] and not data["disclosures"]:
-        print("모든 소스 실패: 기존 market.json 유지", file=sys.stderr)
-        data = old
+    # 실패한 소스는 직전 값을 유지한다(날짜가 함께 표시되므로 오래된 값인지 독자가 알 수 있다)
+    for k in ("groups", "boxoffice"):
+        if not data[k] and old.get(k):
+            print(f"{k}: 이번 수집 실패, 직전 값 유지", file=sys.stderr)
+            data[k] = old[k]
+    data["mode"] = MODE
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"market.json: {sum(len(g['rows']) for g in data.get('groups', []))} quotes, "
           f"boxoffice={'yes' if data.get('boxoffice') else 'no'}, disclosures={len(data.get('disclosures', []))}")
