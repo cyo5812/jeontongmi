@@ -1,160 +1,184 @@
 {
- "updated": "10.27 09:21",
+ "updated": "10.27 09:49",
+ "updated_at": "2026-10-27T09:49+09:00",
  "groups": [
   {
    "name": "국내 · 전자",
+   "basis": "10.27(화) 09:29 장중",
    "rows": [
     {
      "name": "삼성전자",
      "ticker": "005930.KS",
-     "close": 222250.0,
-     "chg": 4.34,
-     "cur": "KRW"
+     "close": 224500.0,
+     "chg": 5.4,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "SK하이닉스",
      "ticker": "000660.KS",
-     "close": 1352000.0,
-     "chg": 6.04,
-     "cur": "KRW"
+     "close": 1363000.0,
+     "chg": 6.9,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "LG전자",
      "ticker": "066570.KS",
-     "close": 159400.0,
-     "chg": 2.18,
-     "cur": "KRW"
+     "close": 159850.0,
+     "chg": 2.47,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     }
    ]
   },
   {
    "name": "국내 · 통신",
+   "basis": "10.27(화) 09:29 장중",
    "rows": [
     {
      "name": "SK텔레콤",
      "ticker": "017670.KS",
-     "close": 77000.0,
-     "chg": 6.8,
-     "cur": "KRW"
+     "close": 75900.0,
+     "chg": 5.27,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "KT",
      "ticker": "030200.KS",
-     "close": 45650.0,
-     "chg": -0.11,
-     "cur": "KRW"
+     "close": 45200.0,
+     "chg": -1.09,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "LG유플러스",
      "ticker": "032640.KS",
-     "close": 14170.0,
-     "chg": 1.0,
-     "cur": "KRW"
+     "close": 14040.0,
+     "chg": 0.07,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     }
    ]
   },
   {
    "name": "국내 · 미디어·플랫폼",
+   "basis": "10.27(화) 09:29 장중",
    "rows": [
     {
      "name": "CJ ENM",
      "ticker": "035760.KQ",
-     "close": 40750.0,
-     "chg": -0.12,
-     "cur": "KRW"
+     "close": 41500.0,
+     "chg": 1.72,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "스튜디오드래곤",
      "ticker": "253450.KQ",
-     "close": 23050.0,
-     "chg": 0.88,
-     "cur": "KRW"
+     "close": 22800.0,
+     "chg": -0.22,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "NAVER",
      "ticker": "035420.KS",
-     "close": 176700.0,
-     "chg": 1.44,
-     "cur": "KRW"
+     "close": 175400.0,
+     "chg": 0.69,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "카카오",
      "ticker": "035720.KS",
-     "close": 29900.0,
-     "chg": 1.18,
-     "cur": "KRW"
+     "close": 29650.0,
+     "chg": 0.34,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     }
    ]
   },
   {
    "name": "국내 · 엔터",
+   "basis": "10.27(화) 09:29 장중",
    "rows": [
     {
      "name": "하이브",
      "ticker": "352820.KS",
-     "close": 174700.0,
-     "chg": 0.34,
-     "cur": "KRW"
+     "close": 173700.0,
+     "chg": -0.23,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "JYP Ent.",
      "ticker": "035900.KQ",
-     "close": 38550.0,
-     "chg": 7.08,
-     "cur": "KRW"
+     "close": 40000.0,
+     "chg": 11.11,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "에스엠",
      "ticker": "041510.KQ",
-     "close": 82500.0,
-     "chg": 1.98,
-     "cur": "KRW"
+     "close": 82400.0,
+     "chg": 1.85,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     },
     {
      "name": "YG엔터",
      "ticker": "122870.KQ",
-     "close": 40300.0,
-     "chg": 1.9,
-     "cur": "KRW"
+     "close": 40900.0,
+     "chg": 3.41,
+     "cur": "KRW",
+     "basis": "10.27(화) 09:29 장중"
     }
    ]
   },
   {
    "name": "해외 (미국 장 기준)",
+   "basis": "10.23(금) 종가",
    "rows": [
     {
      "name": "Netflix",
      "ticker": "NFLX",
      "close": 65.85,
      "chg": -1.79,
-     "cur": "USD"
+     "cur": "USD",
+     "basis": "10.23(금) 종가"
     },
     {
      "name": "Spotify",
      "ticker": "SPOT",
      "close": 584.22,
      "chg": 0.1,
-     "cur": "USD"
+     "cur": "USD",
+     "basis": "10.23(금) 종가"
     },
     {
      "name": "Disney",
      "ticker": "DIS",
      "close": 112.52,
      "chg": -0.54,
-     "cur": "USD"
+     "cur": "USD",
+     "basis": "10.23(금) 종가"
     },
     {
      "name": "Sony",
      "ticker": "SONY",
      "close": 26.08,
      "chg": -0.46,
-     "cur": "USD"
+     "cur": "USD",
+     "basis": "10.23(금) 종가"
     }
    ]
   }
  ],
  "boxoffice": {
-  "date": "10.26",
+  "date": "10.26(월)",
   "items": [
    {
     "rank": 1,
@@ -218,5 +242,6 @@
    }
   ]
  },
- "disclosures": []
+ "disclosures": [],
+ "mode": "intraday"
 }
