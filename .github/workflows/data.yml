@@ -1,12 +1,11 @@
 name: 시장 데이터 수집
 
-# GitHub 예약 실행은 몇 분~몇 시간 늦어질 수 있다. 그래서 화면에는 실행 시각이 아니라 실제 시세 시각을 표시한다.
+# GitHub 예약 실행은 몇 시간씩 늦거나 건너뛸 때가 있다. 그래서 정시 수집은 Claude 예약 작업(발행 데스크 세션)이
+# 이 워크플로를 직접 실행한다: 09:25 개장가, 12:25 장중, 15:55 종가(평일), 아침 발행 때 전일 종가.
+# 아래 예약은 그마저 실패했을 때를 위한 하루 한 번의 예비 실행이다. 화면에는 실제 시세 시각이 표시된다.
 on:
   schedule:
     - cron: "10 21 * * *"   # 06:10 KST 매일 · 전일 종가 (미국 장은 서머타임 해제 후 06:00 KST에 마감)
-    - cron: "25 0 * * 1-5"  # 09:25 KST 평일 · 개장가 (국내 시세는 약 20분 지연)
-    - cron: "25 3 * * 1-5"  # 12:25 KST 평일 · 정오 무렵 현재가
-    - cron: "55 6 * * 1-5"  # 15:55 KST 평일 · 당일 종가
   workflow_dispatch:
     inputs:
       mode:
@@ -32,11 +31,11 @@ jobs:
         env:
           KOBIS_KEY: ${{ secrets.KOBIS_KEY }}
           DART_KEY: ${{ secrets.DART_KEY }}
-          MODE: ${{ github.event.inputs.mode || (github.event.schedule == '25 0 * * 1-5' && 'open') || (github.event.schedule == '25 3 * * 1-5' && 'intraday') || 'close' }}
+          MODE: ${{ github.event.inputs.mode || 'close' }}
         run: python3 scripts/fetch_market.py
       - name: 변경분 커밋
         env:
-          MODE: ${{ github.event.inputs.mode || (github.event.schedule == '25 0 * * 1-5' && 'open') || (github.event.schedule == '25 3 * * 1-5' && 'intraday') || 'close' }}
+          MODE: ${{ github.event.inputs.mode || 'close' }}
         run: |
           git config user.name "jeontongmi-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
