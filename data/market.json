@@ -1,5 +1,5 @@
 {
- "updated": "10.26 08:09",
+ "updated": "10.27 09:21",
  "groups": [
   {
    "name": "국내 · 전자",
@@ -7,22 +7,22 @@
     {
      "name": "삼성전자",
      "ticker": "005930.KS",
-     "close": 215500.0,
-     "chg": 0.47,
+     "close": 222250.0,
+     "chg": 4.34,
      "cur": "KRW"
     },
     {
      "name": "SK하이닉스",
      "ticker": "000660.KS",
-     "close": 1277000.0,
-     "chg": 4.42,
+     "close": 1352000.0,
+     "chg": 6.04,
      "cur": "KRW"
     },
     {
      "name": "LG전자",
      "ticker": "066570.KS",
-     "close": 157100.0,
-     "chg": -1.81,
+     "close": 159400.0,
+     "chg": 2.18,
      "cur": "KRW"
     }
    ]
@@ -33,22 +33,22 @@
     {
      "name": "SK텔레콤",
      "ticker": "017670.KS",
-     "close": 74500.0,
-     "chg": -2.23,
+     "close": 77000.0,
+     "chg": 6.8,
      "cur": "KRW"
     },
     {
      "name": "KT",
      "ticker": "030200.KS",
-     "close": 46800.0,
-     "chg": -1.58,
+     "close": 45650.0,
+     "chg": -0.11,
      "cur": "KRW"
     },
     {
      "name": "LG유플러스",
      "ticker": "032640.KS",
-     "close": 14160.0,
-     "chg": -1.87,
+     "close": 14170.0,
+     "chg": 1.0,
      "cur": "KRW"
     }
    ]
@@ -59,29 +59,29 @@
     {
      "name": "CJ ENM",
      "ticker": "035760.KQ",
-     "close": 40550.0,
-     "chg": 0.12,
+     "close": 40750.0,
+     "chg": -0.12,
      "cur": "KRW"
     },
     {
      "name": "스튜디오드래곤",
      "ticker": "253450.KQ",
-     "close": 23350.0,
-     "chg": -0.85,
+     "close": 23050.0,
+     "chg": 0.88,
      "cur": "KRW"
     },
     {
      "name": "NAVER",
      "ticker": "035420.KS",
-     "close": 173600.0,
-     "chg": -1.59,
+     "close": 176700.0,
+     "chg": 1.44,
      "cur": "KRW"
     },
     {
      "name": "카카오",
      "ticker": "035720.KS",
-     "close": 29950.0,
-     "chg": -1.32,
+     "close": 29900.0,
+     "chg": 1.18,
      "cur": "KRW"
     }
    ]
@@ -92,29 +92,29 @@
     {
      "name": "하이브",
      "ticker": "352820.KS",
-     "close": 176500.0,
-     "chg": -0.4,
+     "close": 174700.0,
+     "chg": 0.34,
      "cur": "KRW"
     },
     {
      "name": "JYP Ent.",
      "ticker": "035900.KQ",
-     "close": 36850.0,
-     "chg": -3.28,
+     "close": 38550.0,
+     "chg": 7.08,
      "cur": "KRW"
     },
     {
      "name": "에스엠",
      "ticker": "041510.KQ",
-     "close": 82900.0,
-     "chg": -2.59,
+     "close": 82500.0,
+     "chg": 1.98,
      "cur": "KRW"
     },
     {
      "name": "YG엔터",
      "ticker": "122870.KQ",
-     "close": 40750.0,
-     "chg": -1.69,
+     "close": 40300.0,
+     "chg": 1.9,
      "cur": "KRW"
     }
    ]
@@ -154,82 +154,69 @@
   }
  ],
  "boxoffice": {
-  "date": "10.25",
+  "date": "10.26",
   "items": [
    {
     "rank": 1,
     "name": "극장판 치이카와: 인어 섬의 비밀",
-    "audi": 135472,
-    "acc": 2248156
+    "audi": 20151,
+    "acc": 2268277
    },
    {
     "rank": 2,
     "name": "암살자(들)",
-    "audi": 26114,
-    "acc": 3374517
+    "audi": 7622,
+    "acc": 3382132
    },
    {
     "rank": 3,
     "name": "실낙원",
-    "audi": 22321,
-    "acc": 104886
+    "audi": 7319,
+    "acc": 112193
    },
    {
     "rank": 4,
     "name": "타짜: 벨제붑의 노래",
-    "audi": 16772,
-    "acc": 1999477
+    "audi": 7011,
+    "acc": 2006488
    },
    {
     "rank": 5,
     "name": "클레이페이스",
-    "audi": 15978,
-    "acc": 77155
+    "audi": 6898,
+    "acc": 84051
    },
    {
     "rank": 6,
     "name": "오디세이",
-    "audi": 7510,
-    "acc": 12311213
+    "audi": 3399,
+    "acc": 12314610
    },
    {
     "rank": 7,
     "name": "여전히 찬란하게",
-    "audi": 7089,
-    "acc": 41037
+    "audi": 3167,
+    "acc": 44204
    },
    {
     "rank": 8,
     "name": "룩백",
-    "audi": 4995,
-    "acc": 131051
+    "audi": 2249,
+    "acc": 133300
    },
    {
     "rank": 9,
     "name": "베러티",
-    "audi": 4306,
-    "acc": 25190
+    "audi": 2243,
+    "acc": 27433
    },
    {
     "rank": 10,
     "name": "킬링타임",
-    "audi": 4087,
-    "acc": 19121
+    "audi": 1305,
+    "acc": 20426
    }
   ]
  },
- "disclosures": [
-  {
-   "date": "20261023",
-   "corp": "KT",
-   "title": "조회공시요구(풍문또는보도)에대한답변(미확정)",
-   "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261023800988"
-  },
-  {
-   "date": "20261023",
-   "corp": "KT",
-   "title": "소송등의제기ㆍ신청(일정금액이상의청구)",
-   "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261023800986"
-  }
- ]
+ "disclosures": []
 }
