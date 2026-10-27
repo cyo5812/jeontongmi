@@ -75,7 +75,8 @@ def quote(sym):
     else:                                              # 장중 현재가(지연 시세)
         price, basis = meta["regularMarketPrice"], f"{day} {mtime:%H:%M} 장중"
     return {"close": round(price, 2), "chg": round((price / prev_close - 1) * 100, 2),
-            "cur": meta.get("currency", ""), "basis": basis}
+            "cur": meta.get("currency", ""), "basis": basis,
+            "as_of": mtime.isoformat(timespec="minutes"), "last_bar": bars[-1][0].isoformat()}
 
 
 def stocks():
