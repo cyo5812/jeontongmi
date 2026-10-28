@@ -416,6 +416,7 @@ function mapCard(id) {
     <div class="chips">${axisBadge(c.axis)}<span class="chip">${c.region === "kr" ? "국내" : "글로벌"}</span><span class="chip">${esc(layer.name)}</span></div>
     <h3>${esc(c.name)}${c.en && c.en !== c.name ? `<small>${esc(c.en)}</small>` : ""}</h3>
     <p class="m-line">${lines(c.line)}</p>
+    ${c.also && c.also.length ? `<h4>걸친 층</h4><ul class="m-also">${c.also.map(([l, label, src]) => `<li><b>${esc(MAP.data.layers.find(x => x.id === l).name)}</b><span>${esc(label)} ${srcLink(src)}</span></li>`).join("")}</ul>` : ""}
     <h4>돈 버는 방식</h4><p>${lines(c.money)}</p>
     <h4>관계 ${rels.length}</h4>
     ${rels.length ? `<ul class="m-rels">${rels.map(r => `<li>
@@ -424,6 +425,7 @@ function mapCard(id) {
       <span class="m-note">${esc(r.note)} ${srcLink(r.src)}</span></li>`).join("")}</ul>` : `<p class="m-muted">아직 기사로 확인된 관계가 없습니다.</p>`}
     <h4>이 회사가 나온 기사 ${arts.length}</h4>
     ${arts.length ? `<ul class="m-arts">${arts.map(a => `<li><a href="${refHref(a.ref)}"><span class="num">${md(a.ref.slice(0, 10))}</span><span>${esc(a.title)}</span></a></li>`).join("")}</ul>` : `<p class="m-muted">아직 없습니다.</p>`}
+    ${c.src && c.src.length ? `<h4>추가 출처</h4><p class="m-srcs">${c.src.map(srcLink).join(" ")}</p>` : ""}
     <button type="button" class="share m-share" data-share="" data-title="${esc(c.name)} · 산업 지도">${SHARE_ICON}<span>이 카드 공유</span></button>
   </div>`;
 }
@@ -431,8 +433,13 @@ function mapCard(id) {
 function renderMap(data, issues) {
   MAP = { data, issues, byId: Object.fromEntries(data.companies.map(c => [c.id, c])), sel: null };
   document.title = "전.통.미. · 산업 지도";
+  const dots = c => `<span class="m-ax">${AXES.map(a => `<i class="${c.axis.includes(a) ? "on" : ""}"></i>`).join("")}</span>`;
+  // 주 위치는 진한 칩, 다른 층에 걸친 사업(also)은 그 층에 흐린 점선 칩으로 한 번 더 놓는다. 어느 쪽을 눌러도 같은 카드.
   const cell = (layer, region) => data.companies.filter(c => c.layer === layer && c.region === region)
-    .map(c => `<button type="button" class="m-co" data-c="${c.id}"><span class="m-ax">${AXES.map(a => `<i class="${c.axis.includes(a) ? "on" : ""}"></i>`).join("")}</span>${esc(c.name)}</button>`).join("");
+    .map(c => `<button type="button" class="m-co" data-c="${c.id}">${dots(c)}${esc(c.name)}</button>`)
+    .concat(data.companies.filter(c => c.region === region && (c.also || []).some(a => a[0] === layer))
+      .map(c => `<button type="button" class="m-co ghost" data-c="${c.id}" data-ghost="1" title="${esc(c.name)}의 주 사업은 다른 층에 있습니다">${esc(c.name)}<small>${esc(c.also.find(a => a[0] === layer)[1])}</small></button>`))
+    .join("");
   return `
   <div class="edition map-edition">
     <div class="w-kicker"><span class="label">INDUSTRY MAP</span><span class="num">${md(data.asof)} 기준</span></div>
@@ -441,7 +448,7 @@ function renderMap(data, issues) {
   </div>
   <div class="layout map-layout">
     <div>
-      <div class="m-legend">${Object.entries(data.relTypes).filter(([k]) => k !== "계열").map(([k, v]) => `<span><i class="rt-${REL_CLS[k]}"></i><b>${k}${k === "지분" ? "·계열" : ""}</b> ${esc(v)}</span>`).join("")}</div>
+      <div class="m-legend">${Object.entries(data.relTypes).filter(([k]) => k !== "계열").map(([k, v]) => `<span><i class="rt-${REL_CLS[k]}"></i><b>${k}${k === "지분" ? "·계열" : ""}</b> ${esc(v)}</span>`).join("")}<span><i class="lg-ghost"></i><b>흐린 칩</b> 주 사업이 아닌 층에 걸친 사업</span></div>
       <div class="m-grid" role="group" aria-label="산업 지도">
         <div class="m-h"></div><div class="m-h">국내</div><div class="m-h">글로벌</div>
         ${data.layers.map(l => `
@@ -461,7 +468,7 @@ function selectCompany(id, scroll) {
   const rel = Object.fromEntries(relOf(id).map(r => [r.to, r.type]));
   document.querySelectorAll(".m-co").forEach(b => {
     const c = b.dataset.c;
-    b.className = "m-co" + (c === id ? " sel" : rel[c] ? " rel rel-" + REL_CLS[rel[c]] : " dim");
+    b.className = "m-co" + (b.dataset.ghost ? " ghost" : "") + (c === id ? " sel" : rel[c] ? " rel rel-" + REL_CLS[rel[c]] : " dim");
     b.setAttribute("aria-pressed", String(c === id));
   });
   document.getElementById("m-rail").innerHTML = mapCard(id);

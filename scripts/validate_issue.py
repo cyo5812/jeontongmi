@@ -39,6 +39,14 @@ def check_companies(errors):
                 errors.append(f"{w}: '{k}' 없음")
         if c.get("layer") not in layers:
             errors.append(f"{w}: layer '{c.get('layer')}' 없음")
+        for a in c.get("also", []):
+            if len(a) != 3 or a[0] not in layers or a[0] == c.get("layer") or not a[1]:
+                errors.append(f"{w}: also 형식 오류 {a} (다른 층 id, 표시 이름, 근거)")
+            elif not (QREF.match(a[2]) or str(a[2]).startswith("https://")):
+                errors.append(f"{w}: also 근거는 기사 ref 또는 https URL ({a[2]})")
+        for u in c.get("src", []):
+            if not str(u).startswith("https://"):
+                errors.append(f"{w}: src는 https URL ({u})")
         for r in c.get("rel", []):
             if len(r) != 4 or r[0] not in data.get("relTypes", {}) or r[1] not in ids:
                 errors.append(f"{w}: 관계 형식 오류 {r}")

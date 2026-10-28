@@ -8,8 +8,8 @@
   },
   {
    "id": "network",
-   "name": "망·유료방송",
-   "desc": "이동통신·유선 인터넷과 그 위에 얹어 파는 IPTV·케이블."
+   "name": "통신·방송",
+   "desc": "망을 깔고 방송을 집까지 보내는 사업자. 이동통신·인터넷, IPTV·케이블·위성, 지상파."
   },
   {
    "id": "platform",
@@ -68,6 +68,13 @@
      "TV를 켜면 처음 보이는 '첫 화면' 자리(삼성 TV플러스 vs IPTV)",
      "2026-10-27#k0"
     ]
+   ],
+   "also": [
+    [
+     "platform",
+     "삼성 TV플러스",
+     "2026-10-27#k0"
+    ]
    ]
   },
   {
@@ -96,6 +103,13 @@
      "경쟁",
      "kt",
      "TV '첫 화면' 자리를 두고 IPTV 셋톱박스와 경쟁",
+     "2026-10-28#k0"
+    ]
+   ],
+   "also": [
+    [
+     "platform",
+     "LG채널·webOS",
      "2026-10-28#k0"
     ]
    ]
@@ -247,6 +261,183 @@
    ]
   },
   {
+   "id": "lghellovision",
+   "name": "LG헬로비전",
+   "region": "kr",
+   "layer": "network",
+   "axis": [
+    "통신",
+    "미디어"
+   ],
+   "line": "케이블TV(종합유선방송, SO) 사업자입니다. 2019년 12월 LG유플러스 계열로 편입됐습니다.",
+   "money": "케이블TV와 인터넷, 렌탈. 2023년 6월 말 가입자 기준 케이블 1위, 전체 유료방송 4위(점유율 10.0%)였습니다.",
+   "aliases": [
+    "LG헬로비전"
+   ],
+   "rel": [
+    [
+     "계열",
+     "lguplus",
+     "2019년 12월 LG유플러스 계열 편입",
+     "https://newstomato.com/ReadNews.aspx?no=1211358"
+    ]
+   ],
+   "src": [
+    "https://newstomato.com/ReadNews.aspx?no=1211358"
+   ]
+  },
+  {
+   "id": "skylife",
+   "name": "KT스카이라이프",
+   "region": "kr",
+   "layer": "network",
+   "axis": [
+    "통신",
+    "미디어"
+   ],
+   "line": "위성방송 사업자입니다. KT가 최대주주입니다.",
+   "money": "위성방송과, 2021년 9월 인수한 케이블TV HCN.",
+   "aliases": [
+    "KT스카이라이프",
+    "스카이라이프"
+   ],
+   "rel": [
+    [
+     "지분",
+     "kt",
+     "KT 49.99%(2018년 말 기준)",
+     "https://www.inews24.com/view/1156878"
+    ]
+   ],
+   "src": [
+    "https://www.inews24.com/view/1156878",
+    "https://newstomato.com/ReadNews.aspx?no=1232178"
+   ]
+  },
+  {
+   "id": "kbs",
+   "name": "KBS",
+   "region": "kr",
+   "layer": "network",
+   "axis": [
+    "미디어"
+   ],
+   "line": "지상파 방송사입니다.",
+   "money": "방송 광고와 드라마·예능 제작. 방송 광고를 허용된 형태만 할 수 있는 규제가 광고 매출이 디지털로 빠져나가는 속도를 키웠다는 지적이 있고, 규제를 네거티브 방식으로 바꾸는 방송법 개정이 추진되고 있습니다.",
+   "aliases": [
+    "KBS"
+   ],
+   "also": [
+    [
+     "content",
+     "드라마 제작",
+     "https://www.starnewskorea.com/en/broadcast-drama/2026/01/07/2026010318061243978"
+    ]
+   ],
+   "rel": [
+    [
+     "지분",
+     "wavve",
+     "웨이브 지분 19.8%(2024년 11월 기준)",
+     "https://biz.sbs.co.kr/amp/article/20000203842"
+    ],
+    [
+     "규제",
+     "kcc",
+     "방송 광고 규제 개편 대상",
+     "2026-10-28#k1"
+    ],
+    [
+     "지분",
+     "skylife",
+     "KT스카이라이프 지분 6.78%(2018년 말 기준)",
+     "https://www.inews24.com/view/1156878"
+    ]
+   ],
+   "src": [
+    "https://biz.sbs.co.kr/amp/article/20000203842",
+    "https://www.starnewskorea.com/en/broadcast-drama/2026/01/07/2026010318061243978"
+   ]
+  },
+  {
+   "id": "mbc",
+   "name": "MBC",
+   "region": "kr",
+   "layer": "network",
+   "axis": [
+    "미디어"
+   ],
+   "line": "지상파 방송사입니다.",
+   "money": "방송 광고와 드라마·예능 제작. 방송 광고를 허용된 형태만 할 수 있는 규제가 광고 매출이 디지털로 빠져나가는 속도를 키웠다는 지적이 있고, 규제를 네거티브 방식으로 바꾸는 방송법 개정이 추진되고 있습니다.",
+   "aliases": [
+    "MBC"
+   ],
+   "also": [
+    [
+     "content",
+     "드라마 제작",
+     "https://www.xportsnews.com/article/2097590"
+    ]
+   ],
+   "rel": [
+    [
+     "지분",
+     "wavve",
+     "웨이브 지분 19.8%(2024년 11월 기준)",
+     "https://biz.sbs.co.kr/amp/article/20000203842"
+    ],
+    [
+     "규제",
+     "kcc",
+     "방송 광고 규제 개편 대상",
+     "2026-10-28#k1"
+    ]
+   ],
+   "src": [
+    "https://biz.sbs.co.kr/amp/article/20000203842",
+    "https://www.xportsnews.com/article/2097590"
+   ]
+  },
+  {
+   "id": "sbs",
+   "name": "SBS",
+   "region": "kr",
+   "layer": "network",
+   "axis": [
+    "미디어"
+   ],
+   "line": "지상파 방송사입니다.",
+   "money": "방송 광고와 드라마·예능 제작. 방송 광고를 허용된 형태만 할 수 있는 규제가 광고 매출이 디지털로 빠져나가는 속도를 키웠다는 지적이 있고, 규제를 네거티브 방식으로 바꾸는 방송법 개정이 추진되고 있습니다.",
+   "aliases": [
+    "SBS"
+   ],
+   "also": [
+    [
+     "content",
+     "드라마 제작",
+     "https://www.xportsnews.com/article/2097590"
+    ]
+   ],
+   "rel": [
+    [
+     "지분",
+     "wavve",
+     "웨이브 지분 19.8%(2024년 11월 기준)",
+     "https://biz.sbs.co.kr/amp/article/20000203842"
+    ],
+    [
+     "규제",
+     "kcc",
+     "방송 광고 규제 개편 대상",
+     "2026-10-28#k1"
+    ]
+   ],
+   "src": [
+    "https://biz.sbs.co.kr/amp/article/20000203842",
+    "https://www.xportsnews.com/article/2097590"
+   ]
+  },
+  {
    "id": "tving",
    "name": "티빙",
    "region": "kr",
@@ -346,6 +537,9 @@
      "9월 월간 이용자 919만명으로 티빙에 2위를 내줌",
      "2026-10-27#k1"
     ]
+   ],
+   "src": [
+    "https://news.mtn.co.kr/news-detail/2025062313461855249"
    ]
   },
   {
@@ -403,6 +597,9 @@
      "티빙 지분 13.54%",
      "2026-10-25#lead"
     ]
+   ],
+   "src": [
+    "https://www.dailian.co.kr/news/view/974683/"
    ]
   },
   {
@@ -426,6 +623,9 @@
      "12.75% 보유, 매각 추진. 전환사채 2,524억원",
      "2026-10-25#lead"
     ]
+   ],
+   "src": [
+    "https://news.mtn.co.kr/news-detail/2026061813512284692"
    ]
   },
   {
@@ -566,6 +766,21 @@
      "가정용 인터넷. 컴캐스트가 꼽은 경쟁자가 고정형 무선 인터넷",
      "2026-10-27#lead"
     ]
+   ],
+   "also": [
+    [
+     "platform",
+     "피콕",
+     "2026-10-26#lead"
+    ],
+    [
+     "content",
+     "NBC·유니버설",
+     "https://www.mediaite.com/media/news/versant-has-officially-split-from-comcast-and-nbc-heres-what-it-means"
+    ]
+   ],
+   "src": [
+    "https://www.mediaite.com/media/news/versant-has-officially-split-from-comcast-and-nbc-heres-what-it-means"
    ]
   },
   {
@@ -611,6 +826,13 @@
      "tving",
      "국내 OTT 이용자 1위(9월 1,551만명)",
      "2026-10-27#k1"
+    ]
+   ],
+   "also": [
+    [
+     "content",
+     "오리지널 제작",
+     "2026-10-25#k1"
     ]
    ]
   },
@@ -670,7 +892,14 @@
     "파라마운트",
     "워너브러더스"
    ],
-   "rel": []
+   "rel": [],
+   "also": [
+    [
+     "platform",
+     "HBO Max·파라마운트+",
+     "2026-10-28#lead"
+    ]
+   ]
   }
  ]
 }
