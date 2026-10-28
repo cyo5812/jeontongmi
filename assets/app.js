@@ -128,9 +128,27 @@ function section(id, title, sub, items, prefix, kl) {
   return `<section id="${id}"><div class="section-head"><h2>${title}</h2><p>${sub}</p></div>${items.map((b, i) => brief(b, prefix + i, kl)).join("")}</section>`;
 }
 
+/* 오늘 움직인 숫자: 전일 종가 기준으로 크게 움직인 종목·지표 3~5개를 '숫자 + 이유'로 보여준다.
+   숫자는 시장 데이터(market.json)에서, 이유는 아침 발행 세션이 기사로 확인해 적는다. */
+function moversPanel(d) {
+  const mv = d.movers || [];
+  if (!mv.length) return "";
+  const bases = mv.map(m => m.basis).filter(Boolean);
+  const basis = bases.length ? bases.sort((a, b) => bases.filter(x => x === b).length - bases.filter(x => x === a).length)[0] : "";
+  return `<div class="movers"><h3>오늘 움직인 숫자${basis ? `<span class="basis">${esc(basis)} 기준</span>` : ""}</h3>
+    <ol>${mv.map(m => {
+      const c = Number(m.chg), has = m.chg !== undefined && m.chg !== null && !isNaN(c);
+      const cls = has ? (c > 0 ? "up" : c < 0 ? "down" : "") : "";
+      const val = m.value || (has ? `${c > 0 ? "+" : ""}${c.toFixed(2)}%` : "");
+      const src = (m.src || [])[0];
+      return `<li><div class="mv-top"><b>${esc(m.name)}</b><span class="mv-val ${cls}">${esc(val)}</span></div>
+        <p class="mv-why"><span aria-hidden="true">›</span>${seg(m.reason)}${src ? ` <a href="${safeUrl(src[1])}" target="_blank" rel="noopener" title="${esc(src[0])}">근거 ↗</a>` : ""}</p></li>`;
+    }).join("")}</ol></div>`;
+}
+
 function marketPanel(m) {
   if (!m || !m.updated) return "";
-  let h = `<div class="market"><h3>시장 · 데이터</h3>`;
+  let h = `<details class="market"><summary>전체 종목 · 박스오피스 · 공시</summary>`;
   (m.groups || []).forEach(g => {
     h += `<table><caption>${esc(g.name)}${g.basis ? `<span class="basis">${esc(g.basis)}</span>` : ""}</caption><tbody>${g.rows.map(r => {
       const c = Number(r.chg), cls = c > 0 ? "up" : c < 0 ? "down" : "";
@@ -143,7 +161,7 @@ function marketPanel(m) {
   if (m.disclosures && m.disclosures.length) {
     h += `<table><caption>주요 공시</caption><tbody>${m.disclosures.slice(0, 6).map(d => `<tr><td colspan="3"><a href="${safeUrl(d.url)}" target="_blank" rel="noopener">${esc(d.corp)} · ${esc(d.title)}</a></td></tr>`).join("")}</tbody></table>`;
   }
-  return h + `<p class="stamp">등락률은 직전 거래일 종가 대비 · ${esc(m.updated)} 수집</p></div>`;
+  return h + `<p class="stamp">등락률은 직전 거래일 종가 대비 · ${esc(m.updated)} 수집</p></details>`;
 }
 
 /* 일정 날짜: "MM.DD"로 시작하면 요일을 코드가 직접 계산해 붙인다(데이터에 적힌 요일은 무시).
@@ -212,6 +230,7 @@ function renderIssue(d, market, older, newer) {
     </div>
     <aside class="rail">
       <nav class="toc" aria-label="이번 호 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav>
+      ${moversPanel(d)}
       ${marketPanel(market)}
       ${d.calendar && d.calendar.length ? `<div class="cal"><h3>다가오는 일정</h3><ul>${d.calendar.map(([w, t, n]) => `<li>${calWhen(w, d.date)}<span>${esc(t)}${n ? `<em>${esc(n)}</em>` : ""}</span></li>`).join("")}</ul></div>` : ""}
       <div class="gloss"><h3>용어 도움말</h3><p>점선 밑줄이 있는 용어에 마우스를 올리거나 탭하면 설명이 나옵니다.</p></div>

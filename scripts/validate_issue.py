@@ -144,6 +144,45 @@ def check_quiz(d, path, errors):
         errors.append("quiz 정답 위치가 모두 같음: 정답 보기 위치를 섞을 것")
 
 
+NO_REASON = "뚜렷한 개별 재료 없음"
+
+
+def check_movers(d, errors):
+    """오늘 움직인 숫자: 2~5개, 이유와 근거 필수. 종목 숫자는 수집된 시장 데이터와 같아야 한다."""
+    mv = d.get("movers")
+    if mv is None:
+        return
+    if not 2 <= len(mv) <= 5:
+        errors.append("movers는 2~5개")
+    market = {}
+    mpath = ROOT / "data" / "market.json"
+    if mpath.exists():
+        for g in json.loads(mpath.read_text(encoding="utf-8")).get("groups", []):
+            for r in g.get("rows", []):
+                market[r.get("ticker")] = r
+    for i, m in enumerate(mv):
+        where = f"movers[{i}]"
+        if not m.get("name") or not m.get("reason"):
+            errors.append(f"{where}: name·reason 필수")
+            continue
+        if len(m["reason"]) > 40:
+            errors.append(f"{where}: reason은 40자 이내 (현재 {len(m['reason'])}자)")
+        if not m["reason"].startswith(NO_REASON) and not m.get("src"):
+            errors.append(f"{where}: 이유의 근거 기사(src)가 없음. 확인이 안 되면 reason을 '{NO_REASON}'로")
+        for name, url in m.get("src") or []:
+            if not str(url).startswith(("http://", "https://")):
+                errors.append(f"{where}: 근거 URL이 이상함 ({name}: {url})")
+        if m.get("chg") is None and not m.get("value"):
+            errors.append(f"{where}: chg(등락률 숫자)나 value(표시할 값) 중 하나는 필요")
+        if m.get("ticker"):
+            if not m.get("basis"):
+                errors.append(f"{where}: 종목이면 basis(예: '10.27(화) 종가')를 market.json에서 그대로 옮길 것")
+            row = market.get(m["ticker"])
+            # 지금 market.json이 같은 기준일 때만 대조한다(지난 호는 데이터가 이미 바뀌었으므로 건너뜀)
+            if row and row.get("basis") == m.get("basis") and abs(float(row["chg"]) - float(m.get("chg", 0))) > 0.005:
+                errors.append(f"{where}: {m['name']} 등락률 {m.get('chg')}%가 market.json({row['chg']}%)과 다름")
+
+
 def validate(path, glossary):
     errors = []
     try:
@@ -171,6 +210,7 @@ def validate(path, glossary):
     for i, f in enumerate(d.get("figures") or []):
         check_figure(f, f"figures[{i}]", errors)
     check_quiz(d, path, errors)
+    check_movers(d, errors)
     if len(d.get("kr") or []) < 2:
         errors.append("국내 브리핑은 최소 2건")
     for key in TERM.findall(path.read_text(encoding="utf-8")):
