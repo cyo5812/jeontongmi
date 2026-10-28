@@ -399,3 +399,4 @@ footer p{margin:4px 0}
   .mast-right{gap:8px}
   .fontswitch button{padding:6px 8px}
 }
+@media (max-width:360px){.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}.theme-toggle{width:32px;height:32px}}
