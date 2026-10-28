@@ -92,6 +92,9 @@
         "네이트 뉴스(국내 유료방송 가입자, 5월)",
         "https://m.news.nate.com/view/20260529n34243"
       ]
+    ],
+    "companies": [
+      "comcast"
     ]
   },
   "kr": [
@@ -125,6 +128,10 @@
           "EBN",
           "https://www.ebn.co.kr/news/articleView.html?idxno=1729034"
         ]
+      ],
+      "companies": [
+        "samsung",
+        "skhynix"
       ]
     },
     {
@@ -153,6 +160,9 @@
           "지디넷코리아(9.30)",
           "https://zdnet.co.kr/view/?no=20260930163614"
         ]
+      ],
+      "companies": [
+        "kcc"
       ]
     }
   ],

@@ -90,6 +90,7 @@
 - **lens(오늘의 관점)**: 오늘 기사들을 묶는 한 문장. 억지로 묶이지 않으면 가장 큰 흐름 하나만 말한다.
 - **headline**: 오늘 호 전체를 한 문장으로.
 - **용어**: 처음 나오는 전문 용어는 `[[key|표시어]]`로 감싼다. key는 `data/glossary.json`에 있어야 하고, 없으면 추가한다(설명은 한두 문장).
+- **companies**: 각 기사(리드·국내·글로벌)에 그 기사의 주인공인 회사·기관의 id를 `data/companies.json`에서 골라 넣는다(예: `["tving","wavve"]`). 시사점에서 한 번 언급만 된 회사는 넣지 않는다. 목록에 없는 회사는 넣지 않고, `data/companies.json`은 고치지 않는다(산업 지도는 사람이 검토해서 관리한다).
 - **axis**: 각 기사가 걸친 축을 `["전자","통신","미디어"]` 중에서 고른다. 해석이 아니라 기사 내용 기준으로.
 - **퀴즈(`quiz`)**: 기억을 시험하는 게 아니라, 지난 기사를 다시 꺼내 보게 하는 장치다.
   - 3문항. **오늘 기사 1문항 + 지난 7일 안의 호 기사 2문항**(지난 호를 고를 때는 `data/issues/`에서 7일 안의 호를 읽는다). 두 문항은 서로 다른 날짜의 호에서 고른다.
@@ -107,8 +108,8 @@
 ```
 date, weekday, vol(직전 호 +1), label(정규 호는 ""), readMin, headline, note(선택),
 brief60[], lens,
-lead{axis, tags, date, title, dek, what[], figure?, why, planner[[자리, 질문]], watch, src[[매체, url]]},
-kr[{axis, tags, date, title, body, why, krline, src}],
+lead{axis, tags, companies, date, title, dek, what[], figure?, why, planner[[자리, 질문]], watch, src[[매체, url]]},
+kr[{axis, tags, companies, date, title, body, why, krline, src}],
 global[{...kr과 같음}],
 figures[{type, kicker, title, caption, note, ...}],
 calendar[[언제, 무엇, 비고]],

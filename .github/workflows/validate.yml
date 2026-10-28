@@ -2,7 +2,7 @@ name: 발행본 검증
 
 on:
   push:
-    paths: ["data/issues/**", "data/weekly/**", "data/glossary.json", "scripts/validate_issue.py", "scripts/validate_weekly.py"]
+    paths: ["data/issues/**", "data/weekly/**", "data/glossary.json", "data/companies.json", "scripts/validate_issue.py", "scripts/validate_weekly.py"]
   pull_request:
 
 jobs:

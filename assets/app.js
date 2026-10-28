@@ -373,6 +373,103 @@ function renderWeekly(w, older, newer, issues) {
   </div>`;
 }
 
+
+/* ---------- 산업 지도 ---------- */
+// 세로: 가치사슬 층, 가로: 국내 / 글로벌. 회사를 누르면 관계가 지도 위에 표시되고 카드가 열린다.
+let MAP = null;
+const REL_CLS = { "지분": "own", "계열": "own", "경쟁": "comp", "협상": "deal", "규제": "rule" };
+
+// 기사별 companies 칸(회사 id 목록)으로 '이 회사가 나온 기사'를 모은다. 칸이 없는 옛 기사는 회사 이름으로 찾는다.
+function storyText(s) { return [s.title, s.dek, s.body, s.why, s.krline].concat(s.what || []).join(" "); }
+function articlesFor(c, issues) {
+  const out = [];
+  issues.forEach(d => {
+    const items = [["lead", d.lead]].concat((d.kr || []).map((s, i) => ["k" + i, s])).concat((d.global || []).map((s, i) => ["g" + i, s]));
+    items.forEach(([a, s]) => {
+      const hit = Array.isArray(s.companies) ? s.companies.includes(c.id) : c.aliases.some(al => storyText(s).includes(al));
+      if (hit) out.push({ ref: `${d.date}#${a}`, title: s.title });
+    });
+  });
+  return out.sort((x, y) => x.ref < y.ref ? 1 : -1);
+}
+
+function relOf(id) {
+  // 양방향: 내가 적은 관계 + 상대가 나를 가리킨 관계(중복 제거)
+  const me = MAP.byId[id], seen = new Set(), out = [];
+  me.rel.forEach(r => { seen.add(r[1] + r[0]); out.push({ type: r[0], to: r[1], note: r[2], src: r[3] }); });
+  MAP.data.companies.forEach(c => c.rel.forEach(r => {
+    if (r[1] === id && !seen.has(c.id + r[0])) { seen.add(c.id + r[0]); out.push({ type: r[0], to: c.id, note: r[2], src: r[3], back: true }); }
+  }));
+  return out;
+}
+
+const srcLink = s => /^\d{4}-\d{2}-\d{2}#/.test(s)
+  ? `<a href="${refHref(s)}" class="m-src">${md(s.slice(0, 10))}호 →</a>`
+  : `<a href="${safeUrl(s)}" target="_blank" rel="noopener" class="m-src">${esc(new URL(s).hostname.replace(/^www\./, ""))} ↗</a>`;
+
+function mapCard(id) {
+  const c = MAP.byId[id];
+  if (!c) return `<div class="m-card m-empty"><p>${lines("지도에서 회사를 누르면 이곳에 관계와 기사가 열립니다.")}</p></div>`;
+  const layer = MAP.data.layers.find(l => l.id === c.layer);
+  const rels = relOf(id), arts = articlesFor(c, MAP.issues);
+  return `<div class="m-card" id="m-card" tabindex="-1">
+    <div class="chips">${axisBadge(c.axis)}<span class="chip">${c.region === "kr" ? "국내" : "글로벌"}</span><span class="chip">${esc(layer.name)}</span></div>
+    <h3>${esc(c.name)}${c.en && c.en !== c.name ? `<small>${esc(c.en)}</small>` : ""}</h3>
+    <p class="m-line">${lines(c.line)}</p>
+    <h4>돈 버는 방식</h4><p>${lines(c.money)}</p>
+    <h4>관계 ${rels.length}</h4>
+    ${rels.length ? `<ul class="m-rels">${rels.map(r => `<li>
+      <span class="rt rt-${REL_CLS[r.type]}">${esc(r.type)}</span>
+      <button type="button" class="m-to" data-c="${esc(r.to)}">${esc(MAP.byId[r.to].name)}</button>
+      <span class="m-note">${esc(r.note)} ${srcLink(r.src)}</span></li>`).join("")}</ul>` : `<p class="m-muted">아직 기사로 확인된 관계가 없습니다.</p>`}
+    <h4>이 회사가 나온 기사 ${arts.length}</h4>
+    ${arts.length ? `<ul class="m-arts">${arts.map(a => `<li><a href="${refHref(a.ref)}"><span class="num">${md(a.ref.slice(0, 10))}</span><span>${esc(a.title)}</span></a></li>`).join("")}</ul>` : `<p class="m-muted">아직 없습니다.</p>`}
+    <button type="button" class="share m-share" data-share="" data-title="${esc(c.name)} · 산업 지도">${SHARE_ICON}<span>이 카드 공유</span></button>
+  </div>`;
+}
+
+function renderMap(data, issues) {
+  MAP = { data, issues, byId: Object.fromEntries(data.companies.map(c => [c.id, c])), sel: null };
+  document.title = "전.통.미. · 산업 지도";
+  const cell = (layer, region) => data.companies.filter(c => c.layer === layer && c.region === region)
+    .map(c => `<button type="button" class="m-co" data-c="${c.id}"><span class="m-ax">${AXES.map(a => `<i class="${c.axis.includes(a) ? "on" : ""}"></i>`).join("")}</span>${esc(c.name)}</button>`).join("");
+  return `
+  <div class="edition map-edition">
+    <div class="w-kicker"><span class="label">INDUSTRY MAP</span><span class="num">${md(data.asof)} 기준</span></div>
+    <h1>산업 지도</h1>
+    <p class="map-dek">${lines("전자·통신·미디어 회사들이 어디에 서 있고 서로 어떻게 묶여 있는지 봅니다. 회사를 누르면 관계가 지도 위에 표시되고, 오른쪽 카드에 근거 기사가 열립니다.")}</p>
+  </div>
+  <div class="layout map-layout">
+    <div>
+      <div class="m-legend">${Object.entries(data.relTypes).filter(([k]) => k !== "계열").map(([k, v]) => `<span><i class="rt-${REL_CLS[k]}"></i><b>${k}${k === "지분" ? "·계열" : ""}</b> ${esc(v)}</span>`).join("")}</div>
+      <div class="m-grid" role="group" aria-label="산업 지도">
+        <div class="m-h"></div><div class="m-h">국내</div><div class="m-h">글로벌</div>
+        ${data.layers.map(l => `
+          <div class="m-layer"><b>${esc(l.name)}</b><span>${esc(l.desc)}</span></div>
+          <div class="m-cell" data-region="국내">${cell(l.id, "kr")}</div>
+          <div class="m-cell" data-region="글로벌">${cell(l.id, "global") || `<span class="m-none">아직 다룬 회사 없음</span>`}</div>`).join("")}
+      </div>
+      <p class="m-foot">${lines("관계와 숫자는 모두 근거 기사나 출처 링크를 달았습니다. 회사 수는 지금까지 기사에 나온 곳 중심이며, 기사가 쌓일수록 늘어납니다.")}</p>
+    </div>
+    <aside class="rail m-rail" id="m-rail">${mapCard(null)}</aside>
+  </div>`;
+}
+
+function selectCompany(id, scroll) {
+  if (!MAP || !MAP.byId[id]) return;
+  MAP.sel = id;
+  const rel = Object.fromEntries(relOf(id).map(r => [r.to, r.type]));
+  document.querySelectorAll(".m-co").forEach(b => {
+    const c = b.dataset.c;
+    b.className = "m-co" + (c === id ? " sel" : rel[c] ? " rel rel-" + REL_CLS[rel[c]] : " dim");
+    b.setAttribute("aria-pressed", String(c === id));
+  });
+  document.getElementById("m-rail").innerHTML = mapCard(id);
+  CURRENT = "map=" + id;
+  try { history.replaceState(null, "", "?map=" + id); } catch (e) { /* 주소만 안 바뀐다 */ }
+  if (scroll && matchMedia("(max-width:900px)").matches) document.getElementById("m-card").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 /* ---------- archive ---------- */
 let INDEX = [], FILTER = "전체";
 function renderArchive(current) {
@@ -406,6 +503,15 @@ async function main() {
     if (nav && WEEKLY.length) nav.hidden = false;
     CW = Math.round(Math.max(320, Math.min(640, app.clientWidth)));
     const q = new URLSearchParams(location.search);
+    if (q.has("map")) {
+      document.getElementById("nav-map")?.setAttribute("aria-current", "page");
+      document.querySelectorAll('.mast nav a[href^="#"]').forEach(a => { if (a.getAttribute("href") !== "#archive") a.href = "./" + a.getAttribute("href"); });
+      const [data, ...issues] = await Promise.all([getJSON("data/companies.json")].concat(INDEX.map(e => getJSON(`data/issues/${e.date}.json`))));
+      app.innerHTML = renderMap(data, issues);
+      document.getElementById("archive").hidden = true;
+      selectCompany(q.get("map") || "tving", false);
+      return;
+    }
     if (q.has("w") && WEEKLY.length) {
       // 위클리 화면: 매일 호 전용 메뉴(#lead 등)는 최신 호로 보낸다
       document.querySelectorAll('.mast nav a[href^="#"]').forEach(a => { if (a.getAttribute("href") !== "#archive") a.href = "./" + a.getAttribute("href"); });
@@ -473,6 +579,8 @@ document.addEventListener("click", e => {
   if (e.target.closest("#theme-toggle")) { toggleTheme(); return; }
   const sb = e.target.closest("[data-share]");
   if (sb) { share(sb); return; }
+  const mc = e.target.closest("[data-c]");
+  if (mc) { selectCompany(mc.dataset.c, true); return; }
   const qb = e.target.closest(".qz-opt");
   if (qb) { answerQuiz(qb); return; }
   const fb = e.target.closest(".fontswitch button");

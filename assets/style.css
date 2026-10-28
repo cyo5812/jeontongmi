@@ -229,8 +229,8 @@ footer p{margin:4px 0}
 .weekly-card:hover{border-color:var(--sky)}
 .weekly-card:hover .wc-go{text-decoration:underline;text-underline-offset:3px}
 
-.weekly-edition .w-kicker{flex-basis:100%;display:flex;gap:12px;align-items:baseline}
-.weekly-edition .w-kicker .num{font-size:13px;font-weight:600;color:var(--accent)}
+.w-kicker{flex-basis:100%;display:flex;gap:12px;align-items:baseline}
+.w-kicker .num{font-size:13px;font-weight:600;color:var(--accent)}
 
 .thread{padding:24px 0;border-bottom:1px solid var(--line)}
 #wthreads > .section-head + .thread{padding-top:30px}
@@ -316,3 +316,86 @@ footer p{margin:4px 0}
 .quiz-score:empty{display:none}
 .quiz-score b{color:var(--accent);font-size:16px}
 @media (max-width:560px){.qz{padding:14px}.qz-q{font-size:16px}}
+
+/* ---------- 산업 지도 ---------- */
+.map-edition h1{flex-basis:100%}
+.map-dek{flex-basis:100%;margin:6px 0 0;font-size:15px;color:var(--sub)}
+.map-dek .line,.m-foot .line,.m-card .line{display:block}
+.m-legend{display:flex;flex-wrap:wrap;gap:6px 18px;padding:22px 0 12px;font-size:12.5px;color:var(--muted)}
+.m-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.m-legend b{color:var(--fg);font-weight:600;margin-right:2px}
+.m-grid{display:grid;grid-template-columns:150px minmax(0,1fr) minmax(0,1fr);border-top:2px solid var(--fg)}
+.m-h{font-size:12.5px;font-weight:700;color:var(--muted);padding:10px 12px;border-bottom:1px solid var(--line)}
+.m-layer{padding:14px 12px 14px 0;border-bottom:1px solid var(--line)}
+.m-layer b{display:block;font-size:14.5px}
+.m-layer span{display:block;font-size:12px;line-height:1.5;color:var(--muted);margin-top:2px}
+.m-cell{display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px;padding:14px 12px;border-bottom:1px solid var(--line);border-left:1px solid var(--line)}
+.m-none{font-size:12.5px;color:var(--muted)}
+.m-co{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:14px;font-weight:600;line-height:1.3;padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer;transition:opacity .15s,background .15s,border-color .15s}
+.m-co:hover{border-color:var(--sky)}
+.m-ax{display:inline-flex;gap:2px}
+.m-ax i{width:5px;height:5px;border-radius:50%;background:var(--line)}
+.m-ax i.on{background:var(--accent)}
+.m-co.sel{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.m-co.sel .m-ax i.on{background:var(--sky)}
+.m-co.dim{opacity:.38}
+.m-co.rel{border-width:2px;padding:6px 10px}
+.rel-own{border-color:var(--accent);background:var(--accent-soft)}
+.rel-comp{border-color:var(--kr);background:var(--kr-soft)}
+.rel-deal{border-color:var(--sky);border-style:dashed}
+.rel-rule{border-color:var(--muted);background:var(--soft)}
+.rt-own{background:var(--accent)} .rt-comp{background:var(--kr)} .rt-deal{background:var(--sky)} .rt-rule{background:var(--muted)}
+.m-foot{font-size:12.5px;color:var(--muted);margin:12px 0 0}
+@media (prefers-reduced-motion:reduce){.m-co{transition:none}}
+
+.m-rail{padding-top:22px}
+.m-card{position:sticky;top:16px;border:1px solid var(--line);border-radius:8px;padding:18px;background:var(--soft)}
+.m-card:focus{outline:none}
+.m-card h3{font-size:22px;margin:10px 0 4px;letter-spacing:-.02em}
+.m-card h3 small{display:block;font-size:12.5px;font-weight:500;color:var(--muted);letter-spacing:0;margin-top:2px}
+.m-card h4{font-size:12.5px;color:var(--muted);margin:16px 0 6px;font-weight:700}
+.m-card p{margin:0;font-size:14px;line-height:1.65}
+.m-card .m-line{color:var(--sub)}
+.m-muted{color:var(--muted)}
+.m-rels,.m-arts{list-style:none;margin:0;padding:0}
+.m-rels li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 8px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:13.5px}
+.m-rels .rt{grid-row:span 2;font-size:11px;font-weight:700;color:#fff;padding:1px 6px;border-radius:3px;white-space:nowrap}
+.m-to{justify-self:start;font:inherit;font-weight:700;font-size:14px;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--accent-3)}
+.m-note{color:var(--sub);line-height:1.55}
+.m-src{font-size:12px;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap}
+.m-arts a{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px;line-height:1.5;text-decoration:none;color:var(--sub)}
+.m-arts a:hover{color:var(--accent)}
+.m-arts .num{font-size:12px;font-weight:600;color:var(--accent)}
+.m-share{margin-top:16px}
+.m-empty p{color:var(--muted);font-size:14px}
+@media (max-width:900px){.m-card{position:static}.m-rail{padding-top:16px}}
+@media (max-width:640px){
+  .m-grid{grid-template-columns:minmax(0,1fr)}
+  .m-grid .m-h{display:none}
+  .m-layer{padding:16px 0 6px;border-bottom:0}
+  .m-cell{border-left:0;padding:4px 0 12px}
+  .m-cell::before{content:attr(data-region);flex-basis:100%;font-size:11.5px;font-weight:700;color:var(--muted)}
+  .m-cell[data-region="국내"]{border-bottom:0}
+  .m-co{font-size:13.5px;padding:6px 10px}
+}
+
+/* 상단 '산업 지도' 버튼: 호 안의 위치 이동(리드·국내…)과 달리 별도 페이지라서 버튼 모양으로 구분한다 */
+.nav-map{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;line-height:1;color:var(--accent);text-decoration:none;padding:8px 12px;border:1px solid var(--sky);border-radius:999px;background:var(--accent-soft);white-space:nowrap}
+.nav-map:hover{background:var(--bg)}
+.nav-map[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.mast-right > nav + .nav-map{margin-left:-6px}
+@media (max-width:560px){
+  .mast-right{gap:10px}
+  .nav-map{padding:7px 10px;font-size:12.5px}
+}
+.logo,.mast nav a{white-space:nowrap}
+.mast-right{flex-shrink:0}
+@media (max-width:980px){.mast nav{gap:14px}.tagline{display:none}}
+@media (max-width:380px){
+  .mast .wrap{gap:10px}
+  .nav-map span{display:none}
+  .nav-map{padding:8px}
+  .nav-map::after{content:"지도";font-size:12.5px}
+  .mast-right{gap:8px}
+  .fontswitch button{padding:6px 8px}
+}

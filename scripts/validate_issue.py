@@ -18,6 +18,34 @@ QREF = re.compile(r"^(\d{4}-\d{2}-\d{2})#(lead|k\d+|g\d+)$")
 QTYPES = {"인과", "연결", "감각"}
 
 
+COMPANIES = set()
+
+
+def check_companies(errors):
+    """data/companies.json: 관계 대상이 실제 회사인지, 근거가 기사(YYYY-MM-DD#..) 또는 URL인지."""
+    p = ROOT / "data" / "companies.json"
+    if not p.exists():
+        return
+    data = json.loads(p.read_text(encoding="utf-8"))
+    layers = {l["id"] for l in data.get("layers", [])}
+    ids = [c["id"] for c in data.get("companies", [])]
+    COMPANIES.update(ids)
+    if len(ids) != len(set(ids)):
+        errors.append("companies.json: 회사 id 중복")
+    for c in data.get("companies", []):
+        w = f"companies.json {c.get('id')}"
+        for k in ("name", "region", "layer", "axis", "line", "money", "aliases"):
+            if not c.get(k):
+                errors.append(f"{w}: '{k}' 없음")
+        if c.get("layer") not in layers:
+            errors.append(f"{w}: layer '{c.get('layer')}' 없음")
+        for r in c.get("rel", []):
+            if len(r) != 4 or r[0] not in data.get("relTypes", {}) or r[1] not in ids:
+                errors.append(f"{w}: 관계 형식 오류 {r}")
+            elif not (QREF.match(r[3]) or str(r[3]).startswith("https://")):
+                errors.append(f"{w}: 관계 근거는 기사 ref 또는 https URL ({r[3]})")
+
+
 def check_story(s, where, errors, need_kr=True):
     for k in ("title", "body" if "body" in s or where != "lead" else "dek", "src"):
         if not s.get(k):
@@ -28,6 +56,9 @@ def check_story(s, where, errors, need_kr=True):
     for name, url in s.get("src") or []:
         if not str(url).startswith(("http://", "https://")):
             errors.append(f"{where}: 출처 URL이 이상함 ({name}: {url})")
+    for cid in s.get("companies") or []:
+        if COMPANIES and cid not in COMPANIES:
+            errors.append(f"{where}: companies의 '{cid}'가 data/companies.json에 없음")
     if need_kr and not s.get("krline"):
         errors.append(f"{where}: 'krline'(한국 시사점) 없음")
 
@@ -143,6 +174,13 @@ def validate(path, glossary):
 def main():
     glossary = json.loads((ROOT / "data" / "glossary.json").read_text(encoding="utf-8"))
     entries, failed = [], False
+    cerr = []
+    check_companies(cerr)
+    if cerr:
+        failed = True
+        print("✗ companies.json")
+        for e in cerr:
+            print(f"   - {e}")
     for path in sorted(ISSUES.glob("*.json"), reverse=True):
         d, errors = validate(path, glossary)
         if errors:

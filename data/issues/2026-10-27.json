@@ -63,6 +63,9 @@
         "Verizon 2분기 실적(SEC)",
         "https://www.sec.gov/Archives/edgar/data/0000732712/000073271226000040/a2026q2exhibit99.htm"
       ]
+    ],
+    "companies": [
+      "verizon"
     ]
   },
   "kr": [
@@ -93,6 +96,9 @@
           "데일리한국",
           "https://daily.hankooki.com/news/articleView.html?idxno=1418155"
         ]
+      ],
+      "companies": [
+        "lguplus"
       ]
     },
     {
@@ -117,6 +123,12 @@
           "Korea JoongAng Daily",
           "https://www.koreajoongangdaily.com/bilingual-news/tvingwavve-merger-remains-stalled-as-rivals-move-ahead-kor/12929052"
         ]
+      ],
+      "companies": [
+        "tving",
+        "wavve",
+        "coupangplay",
+        "netflix"
       ]
     }
   ],

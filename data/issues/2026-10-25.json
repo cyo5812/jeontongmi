@@ -94,6 +94,15 @@
         "머니투데이(8월 컨콜)",
         "https://www.mt.co.kr/tech/2026/08/06/2026080615011867212"
       ]
+    ],
+    "companies": [
+      "tving",
+      "wavve",
+      "kt",
+      "ktstudiogenie",
+      "cjenm",
+      "sll",
+      "ftc"
     ]
   },
   "kr": [
@@ -120,6 +129,12 @@
           "머니투데이방송",
           "https://news.mtn.co.kr/news-detail/2026092318213194426"
         ]
+      ],
+      "companies": [
+        "kt",
+        "skb",
+        "lguplus",
+        "kcc"
       ]
     },
     {
@@ -144,6 +159,9 @@
           "머니투데이(영문)",
           "https://www.mt.co.kr/en/tech/2026/10/14/2026101408112241938"
         ]
+      ],
+      "companies": [
+        "netflix"
       ]
     },
     {
@@ -172,6 +190,9 @@
           "비건뉴스(JYP)",
           "https://www.vegannews.co.kr/news/article.html?no=393987"
         ]
+      ],
+      "companies": [
+        "hybe"
       ]
     },
     {
@@ -196,6 +217,11 @@
           "전자신문",
           "https://www.etnews.com/20261001000176"
         ]
+      ],
+      "companies": [
+        "kt",
+        "skt",
+        "lguplus"
       ]
     }
   ],
@@ -226,6 +252,9 @@
           "CNBC(감원)",
           "https://www.cnbc.com/2026/10/14/netflix-layoffs.html"
         ]
+      ],
+      "companies": [
+        "netflix"
       ]
     },
     {
@@ -250,6 +279,9 @@
           "Hypebot",
           "https://www.hypebot.com/spotify-q3-2026-788m-users-and-306m-subscribers/"
         ]
+      ],
+      "companies": [
+        "spotify"
       ]
     }
   ],
