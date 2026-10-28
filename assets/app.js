@@ -164,7 +164,8 @@ function renderIssue(d, market, older, newer) {
   const L = d.lead;
   const toc = [["LEAD", "#lead", L.title]]
     .concat((d.kr || []).map((b, i) => ["국내", "#k" + i, b.title]))
-    .concat((d.global || []).map((b, i) => ["GLOBAL", "#g" + i, b.title]));
+    .concat((d.global || []).map((b, i) => ["GLOBAL", "#g" + i, b.title]))
+    .concat(d.quiz && d.quiz.length ? [["QUIZ", "#quiz", `오늘의 퀴즈 ${d.quiz.length}문항`]] : []);
   const dt = d.date.replaceAll("-", ".");
   document.title = `전.통.미. · ${dt}`;
   return `
@@ -207,6 +208,7 @@ function renderIssue(d, market, older, newer) {
       ${section("kr", "국내 브리핑", `${(d.kr || []).length}건`, d.kr, "k", "산업 시사점")}
       ${section("global", "글로벌 브리핑", `${(d.global || []).length}건 · 모두 한국 시사점 포함`, d.global, "g")}
       ${d.figures && d.figures.length ? `<section id="numbers"><div class="section-head"><h2>숫자로 보는 산업</h2><p>오늘 기사 속 수치를 한눈에</p></div>${d.figures.map(f => figure(f)).join("")}</section>` : ""}
+      ${quizSection(d)}
     </div>
     <aside class="rail">
       <nav class="toc" aria-label="이번 호 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav>
@@ -217,6 +219,62 @@ function renderIssue(d, market, older, newer) {
   </div>`;
 }
 
+
+
+/* ---------- 오늘의 퀴즈 ---------- */
+// 매일 3문항: 오늘 기사 1 + 지난 7일 기사 2. 고르면 바로 정답·해설·원래 기사 링크가 열린다.
+// 푼 기록은 이 브라우저에만 저장한다(없어도 화면은 정상 동작).
+const QKEY = d => `jtm-quiz-${d}`;
+const qLoad = d => { try { return JSON.parse(localStorage.getItem(QKEY(d)) || "{}"); } catch (e) { return {}; } };
+const qSave = (d, v) => { try { localStorage.setItem(QKEY(d), JSON.stringify(v)); } catch (e) { /* 저장이 막혀도 이번 화면에서는 풀 수 있다 */ } };
+let QUIZ = null;
+
+function quizSection(d) {
+  if (!d.quiz || !d.quiz.length) { QUIZ = null; return ""; }
+  QUIZ = { date: d.date, items: d.quiz, picked: qLoad(d.date) };
+  return `<section id="quiz">
+    <div class="section-head"><h2>오늘의 퀴즈</h2><p>${d.quiz.length}문항 · 1분</p></div>
+    <ol class="quiz">${d.quiz.map((q, i) => quizItem(q, i, d.date)).join("")}</ol>
+    <p class="quiz-score" id="quiz-score" aria-live="polite">${quizScore()}</p>
+  </section>`;
+}
+
+function quizItem(q, i, today) {
+  const rd = String(q.ref).slice(0, 10), pick = QUIZ.picked[i];
+  const done = pick !== undefined;
+  const from = rd === today ? "오늘 기사" : `${rd.slice(5).replace("-", ".")}호에서`;
+  return `<li class="qz${done ? " done" : ""}" id="q${i}">
+    <div class="qz-head"><span class="label">Q${i + 1}</span><span class="qz-from${rd === today ? "" : " past"}">${from}</span>${q.type ? `<span class="qz-type">${esc(q.type)}</span>` : ""}</div>
+    <p class="qz-q">${lines(q.q)}</p>
+    <div class="qz-opts" role="group" aria-label="Q${i + 1} 보기">${q.options.map((o, k) => {
+      const cls = !done ? "" : k === q.answer ? " right" : k === pick ? " wrong" : " dim";
+      return `<button type="button" class="qz-opt${cls}" data-q="${i}" data-o="${k}"${done ? " disabled" : ""}><span class="qz-k num">${"ABCD"[k]}</span><span>${rich(o)}</span></button>`;
+    }).join("")}</div>
+    <div class="qz-explain"${done ? "" : " hidden"}>
+      <b>${done && pick === q.answer ? "정답이에요." : "정답은 " + "ABCD"[q.answer] + "입니다."}</b>
+      <p>${rich(q.explain)}</p>
+      <a href="${refHref(q.ref)}" class="qz-ref">원래 기사 보기 →</a>
+    </div>
+  </li>`;
+}
+
+function quizScore() {
+  const n = QUIZ.items.length, picked = Object.keys(QUIZ.picked).length;
+  if (picked < n) return "";
+  const ok = QUIZ.items.filter((q, i) => QUIZ.picked[i] === q.answer).length;
+  return `${n}문항 중 <b class="num">${ok}</b>개 맞혔어요.${ok < n ? " 틀린 문제는 원래 기사에서 다시 확인해 보세요." : ""}`;
+}
+
+function answerQuiz(btn) {
+  if (!QUIZ) return;
+  const i = +btn.dataset.q, k = +btn.dataset.o;
+  if (QUIZ.picked[i] !== undefined) return;
+  QUIZ.picked[i] = k; qSave(QUIZ.date, QUIZ.picked);
+  const li = document.getElementById("q" + i);
+  li.outerHTML = quizItem(QUIZ.items[i], i, QUIZ.date);
+  document.getElementById("quiz-score").innerHTML = quizScore();
+  document.querySelector(`#q${i} .qz-explain`)?.focus?.();
+}
 
 /* ---------- 위클리 리포트 ---------- */
 let WEEKLY = [];
@@ -415,6 +473,8 @@ document.addEventListener("click", e => {
   if (e.target.closest("#theme-toggle")) { toggleTheme(); return; }
   const sb = e.target.closest("[data-share]");
   if (sb) { share(sb); return; }
+  const qb = e.target.closest(".qz-opt");
+  if (qb) { answerQuiz(qb); return; }
   const fb = e.target.closest(".fontswitch button");
   if (fb) { setFont(fb.dataset.font); return; }
   const b = e.target.closest("[data-f]");

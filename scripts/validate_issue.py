@@ -7,12 +7,15 @@ Exits non-zero (and leaves index.json untouched) if any issue is malformed.
 import json
 import re
 import sys
+from datetime import date, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ISSUES = ROOT / "data" / "issues"
 AXES = {"전자", "통신", "미디어"}
 TERM = re.compile(r"\[\[([a-z0-9_-]+)\|[^\]]+\]\]")
+QREF = re.compile(r"^(\d{4}-\d{2}-\d{2})#(lead|k\d+|g\d+)$")
+QTYPES = {"인과", "연결", "감각"}
 
 
 def check_story(s, where, errors, need_kr=True):
@@ -43,6 +46,65 @@ def check_figure(f, where, errors):
         errors.append(f"{where}: note(출처) 없음")
 
 
+def check_quiz(d, path, errors):
+    """오늘의 퀴즈: 3문항, 오늘 기사 1 + 지난 7일 기사 2(지난 호가 없으면 오늘 기사로 대체)."""
+    quiz = d.get("quiz")
+    if quiz is None:
+        return
+    if len(quiz) != 3:
+        errors.append("quiz는 3문항")
+    today = date.fromisoformat(d["date"])
+    past_available = any(today - timedelta(days=7) <= date.fromisoformat(p.stem) < today
+                         for p in ISSUES.glob("????-??-??.json"))
+    n_today = n_past = 0
+    answers = []
+    for i, q in enumerate(quiz):
+        where = f"quiz[{i}]"
+        for k in ("q", "options", "explain", "ref"):
+            if not q.get(k):
+                errors.append(f"{where}: '{k}' 없음")
+        if q.get("type") not in QTYPES:
+            errors.append(f"{where}: type은 {sorted(QTYPES)} 중 하나")
+        opts = q.get("options") or []
+        if any(TERM.search(str(o)) for o in opts):
+            errors.append(f"{where}: 보기에는 용어 표시([[..]])를 쓰지 않음(정답 힌트가 됨)")
+        if not 3 <= len(opts) <= 4 or len(set(opts)) != len(opts):
+            errors.append(f"{where}: 보기는 서로 다른 3~4개")
+        a = q.get("answer")
+        if not isinstance(a, int) or not 0 <= a < len(opts):
+            errors.append(f"{where}: answer는 보기 번호(0부터)")
+        answers.append(a)
+        m = QREF.match(str(q.get("ref") or ""))
+        if not m:
+            errors.append(f"{where}: ref 형식은 'YYYY-MM-DD#lead|k0|g0'")
+            continue
+        rd, anchor = m.groups()
+        rday = date.fromisoformat(rd)
+        if rday == today:
+            n_today += 1
+            src = d
+        elif today - timedelta(days=7) <= rday < today:
+            n_past += 1
+            p = ISSUES / f"{rd}.json"
+            src = json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+            if src is None:
+                errors.append(f"{where}: ref {rd} 호가 없음")
+                continue
+        else:
+            errors.append(f"{where}: ref는 오늘 또는 지난 7일 안의 호여야 함 ({rd})")
+            continue
+        if anchor != "lead":
+            sec, n = ("kr" if anchor[0] == "k" else "global"), int(anchor[1:])
+            if n >= len(src.get(sec) or []):
+                errors.append(f"{where}: ref {q['ref']}가 가리키는 기사가 없음")
+    if past_available and (n_today != 1 or n_past != 2):
+        errors.append(f"quiz는 오늘 기사 1문항 + 지난 7일 기사 2문항 (현재 오늘 {n_today}, 지난 {n_past})")
+    if sum(q.get("type") in ("인과", "연결") for q in quiz) < 2:
+        errors.append("quiz는 '인과'나 '연결' 문항이 2개 이상이어야 함")
+    if len(answers) == 3 and len(set(answers)) == 1:
+        errors.append("quiz 정답 위치가 모두 같음: 정답 보기 위치를 섞을 것")
+
+
 def validate(path, glossary):
     errors = []
     try:
@@ -69,6 +131,7 @@ def validate(path, glossary):
         check_story(s, f"global[{i}]", errors)
     for i, f in enumerate(d.get("figures") or []):
         check_figure(f, f"figures[{i}]", errors)
+    check_quiz(d, path, errors)
     if len(d.get("kr") or []) < 2:
         errors.append("국내 브리핑은 최소 2건")
     for key in TERM.findall(path.read_text(encoding="utf-8")):

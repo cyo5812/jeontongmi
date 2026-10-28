@@ -289,3 +289,30 @@ footer p{margin:4px 0}
   .wnum > b{font-size:20px}
   .timeline a{grid-template-columns:minmax(0,1fr);gap:0}
 }
+
+/* ---------- 오늘의 퀴즈 ---------- */
+.quiz{list-style:none;margin:0;padding:24px 0 0;display:grid;gap:14px}
+.qz{border:1px solid var(--line);border-radius:6px;padding:18px 20px;background:var(--soft)}
+.qz-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:12.5px}
+.qz-from{font-weight:600;color:var(--accent);background:var(--accent-soft);padding:1px 8px;border-radius:3px}
+.qz-from.past{color:var(--sub);background:var(--bg);border:1px solid var(--line)}
+.qz-q .line{display:block}
+.qz-type{color:var(--muted)}
+.qz-q{margin:10px 0 12px;font-size:16.5px;font-weight:600;line-height:1.6;max-width:68ch}
+.qz-opts{display:grid;gap:8px}
+.qz-opt{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;align-items:baseline;width:100%;text-align:left;font:inherit;font-size:15px;line-height:1.55;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;cursor:pointer}
+.qz-opt:hover:not(:disabled){border-color:var(--sky);background:var(--accent-soft)}
+.qz-opt .qz-k{font-size:12.5px;font-weight:600;color:var(--accent)}
+.qz-opt:disabled{cursor:default}
+.qz-opt.right{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.qz-opt.wrong{border-color:var(--kr);background:var(--kr-soft);box-shadow:inset 3px 0 0 var(--kr)}
+.qz-opt.wrong .qz-k{color:var(--kr)}
+.qz-opt.dim{opacity:.55}
+.qz-explain{margin-top:12px;padding-top:12px;border-top:1px dashed var(--accent-3);font-size:14.5px}
+.qz-explain p{margin:4px 0 6px;color:var(--sub);max-width:68ch}
+.qz-ref{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none}
+.qz-ref:hover{text-decoration:underline;text-underline-offset:3px}
+.quiz-score{margin:14px 0 0;font-size:14.5px;color:var(--sub)}
+.quiz-score:empty{display:none}
+.quiz-score b{color:var(--accent);font-size:16px}
+@media (max-width:560px){.qz{padding:14px}.qz-q{font-size:16px}}
