@@ -219,3 +219,73 @@ footer p{margin:4px 0}
 .issue-nav b{font-size:12px;font-weight:600;color:var(--accent)}
 .issue-nav .next{text-align:right;margin-left:auto}
 .issue-nav .off{color:var(--muted);font-size:12.5px;justify-content:center}
+
+/* ---------- 위클리 리포트 ---------- */
+/* 월요일 호 상단 카드: 팝업 대신 본문 흐름 안에 둔다 */
+.weekly-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:baseline;gap:4px 14px;margin-top:14px;padding:14px 18px;border:1px solid var(--accent-3);border-left:4px solid var(--sky);border-radius:6px;background:var(--accent-soft);text-decoration:none}
+.weekly-card .wc-span{font-size:12.5px;font-weight:600;color:var(--accent)}
+.weekly-card b{grid-column:1 / -1;font-size:16px;line-height:1.55}
+.weekly-card .wc-go{grid-column:3;grid-row:1;font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap}
+.weekly-card:hover{border-color:var(--sky)}
+.weekly-card:hover .wc-go{text-decoration:underline;text-underline-offset:3px}
+
+.weekly-edition .w-kicker{flex-basis:100%;display:flex;gap:12px;align-items:baseline}
+.weekly-edition .w-kicker .num{font-size:13px;font-weight:600;color:var(--accent)}
+
+.thread{padding:24px 0;border-bottom:1px solid var(--line)}
+#wthreads > .section-head + .thread{padding-top:30px}
+.thread h3{font-size:20px;line-height:1.5;margin:8px 0 10px}
+.thread > p{margin:0 0 10px;max-width:70ch}
+.thread .why{color:var(--sub);font-size:15px}
+.thread .why b,.thread .t-next b{color:var(--fg);margin-right:6px}
+.thread .t-next{font-size:15px;color:var(--sub);margin:0 0 10px}
+.timeline{list-style:none;margin:14px 0 16px;padding:0 0 0 2px;max-width:70ch}
+.timeline li{position:relative;padding:0 0 0 18px}
+.timeline li::before{content:"";position:absolute;left:3px;top:11px;width:7px;height:7px;border-radius:50%;background:var(--sky)}
+.timeline li:not(:last-child)::after{content:"";position:absolute;left:6px;top:20px;bottom:-9px;width:1px;background:var(--accent-3)}
+.timeline li + li{margin-top:8px}
+.timeline a{display:grid;grid-template-columns:76px minmax(0,1fr);gap:8px;text-decoration:none;font-size:15px;line-height:1.6}
+.timeline a .num{font-size:12.5px;font-weight:600;color:var(--accent);padding-top:2px;white-space:nowrap}
+.timeline a:hover span:last-child{color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+
+.wnums{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;padding-top:24px}
+.wnum{display:flex;flex-direction:column;gap:4px;padding:16px;border:1px solid var(--line);border-radius:6px;background:var(--soft);text-decoration:none}
+.wnum:hover{border-color:var(--sky)}
+.wnum > b{font-size:24px;font-weight:600;color:var(--ink-strong);letter-spacing:-.02em;line-height:1.25}
+.wnum .wn-label{font-size:14px;font-weight:600;line-height:1.5}
+.wnum .wn-note{font-size:13px;color:var(--sub);line-height:1.55}
+.wnum .wn-ref{margin-top:auto;padding-top:6px;font-size:11.5px;color:var(--accent)}
+
+.checkback,.wnext{list-style:none;margin:0;padding:0}
+.checkback li,.wnext li{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
+.checkback .when,.wnext .when{font-size:12.5px;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums;padding-top:2px}
+.checkback .when .nb,.wnext .when .nb{white-space:nowrap}
+.checkback .when small,.wnext .when small{display:block;font-size:12px;font-weight:500;color:var(--sub)}
+.checkback b,.wnext b{font-size:15.5px}
+.checkback p,.wnext p{margin:4px 0 0;font-size:14.5px;color:var(--sub);max-width:68ch}
+.st{display:inline-block;margin-left:8px;font-size:11.5px;font-weight:700;padding:1px 7px;border-radius:999px;vertical-align:1px;white-space:nowrap}
+.st-ok{background:var(--accent-soft);color:var(--accent)}
+.st-chg{background:var(--kr-soft);color:var(--kr)}
+.st-wait,.st-none{background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+.cb-ref{font-size:12.5px;font-weight:600;color:var(--accent);white-space:nowrap;text-decoration:none}
+
+.week-issues ul{list-style:none;margin:0;padding:0}
+.week-issues a{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.5;text-decoration:none;color:var(--sub)}
+.week-issues a .num{font-size:12px;font-weight:600;color:var(--accent);padding-top:1px;white-space:nowrap}
+.week-issues a:hover{color:var(--accent)}
+
+.archive .wtag{display:inline-block;margin-right:6px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--bg);background:var(--accent);padding:1px 5px;border-radius:3px;vertical-align:1px}
+.archive .is-weekly .num{font-size:12.5px;white-space:nowrap}
+.archive .is-weekly a{background:linear-gradient(90deg,var(--accent-soft),transparent 70%)}
+.archive li a{align-items:baseline}
+@media (min-width:561px){.archive .is-weekly a > span:first-child{display:flex;flex-direction:column}}
+
+@media (min-width:640px){.thread .story{text-align:justify;text-justify:inter-word}}
+@media (max-width:560px){
+  .weekly-card{grid-template-columns:minmax(0,1fr);padding:14px}
+  .weekly-card .wc-go{grid-column:1;grid-row:auto}
+  .wnums{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+  .wnum{padding:12px}
+  .wnum > b{font-size:20px}
+  .timeline a{grid-template-columns:minmax(0,1fr);gap:0}
+}
