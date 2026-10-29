@@ -9,6 +9,13 @@ jobs:
     env:
       DOMAIN: jeontongmi.kro.kr
     steps:
+      - name: "진단 요약(로그를 못 볼 때 annotation으로 확인)"
+        if: always()
+        run: |
+          echo "::notice title=DNS::CNAME=$(dig +short CNAME $DOMAIN | tr '\n' ' ') A=$(dig +short A $DOMAIN | tr '\n' ' ') AAAA=$(dig +short AAAA $DOMAIN | tr '\n' ' ')"
+          echo "::notice title=HTTP::$(curl -sS -o /dev/null -w '%{http_code} -> %{redirect_url}' http://$DOMAIN/ 2>&1)"
+          echo "::notice title=HTTPS::$(curl -sS -o /dev/null -w '%{http_code}' https://$DOMAIN/ 2>&1 | tr '\n' ' ')"
+          echo "::notice title=CERT::$(echo | openssl s_client -connect $DOMAIN:443 -servername $DOMAIN 2>/dev/null | openssl x509 -noout -subject -issuer -enddate -ext subjectAltName 2>&1 | tr '\n' ' ')"
       - name: "DNS: CNAME이 cyo5812.github.io를 가리킴"
         if: always()
         run: |
