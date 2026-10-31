@@ -1,6 +1,6 @@
 {
- "updated": "10.31 09:41",
- "updated_at": "2026-10-31T09:41+09:00",
+ "updated": "11.01 06:38",
+ "updated_at": "2026-11-01T06:38+09:00",
  "groups": [
   {
    "name": "국내 · 전자",
@@ -214,67 +214,67 @@
   }
  ],
  "boxoffice": {
-  "date": "10.30(금)",
+  "date": "10.31(토)",
   "items": [
    {
     "rank": 1,
     "name": "극장판 치이카와: 인어 섬의 비밀",
-    "audi": 31185,
-    "acc": 2393387
+    "audi": 97464,
+    "acc": 2490845
    },
    {
     "rank": 2,
     "name": "하트 오브 비스트",
-    "audi": 30097,
-    "acc": 82544
+    "audi": 68733,
+    "acc": 151277
    },
    {
     "rank": 3,
     "name": "수능, 출제의 비밀",
-    "audi": 12543,
-    "acc": 39511
+    "audi": 17053,
+    "acc": 56564
    },
    {
     "rank": 4,
     "name": "암살자(들)",
-    "audi": 9658,
-    "acc": 3416350
+    "audi": 16425,
+    "acc": 3432775
    },
    {
     "rank": 5,
-    "name": "타짜: 벨제붑의 노래",
-    "audi": 7163,
-    "acc": 2035989
+    "name": "진격의 거인: 홍련의 화살",
+    "audi": 12613,
+    "acc": 60866
    },
    {
     "rank": 6,
-    "name": "진격의 거인: 홍련의 화살",
-    "audi": 6192,
-    "acc": 48253
+    "name": "타짜: 벨제붑의 노래",
+    "audi": 10494,
+    "acc": 2046483
    },
    {
     "rank": 7,
-    "name": "실낙원",
-    "audi": 5191,
-    "acc": 139567
+    "name": "클레이페이스",
+    "audi": 6862,
+    "acc": 110076
    },
    {
     "rank": 8,
-    "name": "클레이페이스",
-    "audi": 4391,
-    "acc": 103214
+    "name": "실낙원",
+    "audi": 6655,
+    "acc": 146222
    },
    {
     "rank": 9,
-    "name": "그대, 별처럼",
-    "audi": 3332,
-    "acc": 13719
+    "name": "오디세이",
+    "audi": 5387,
+    "acc": 12330170
    },
    {
     "rank": 10,
-    "name": "오디세이",
-    "audi": 2845,
-    "acc": 12324783
+    "name": "룩백",
+    "audi": 3541,
+    "acc": 145976
    }
   ]
  },
@@ -302,31 +302,7 @@
    "corp": "SK텔레콤",
    "title": "현금ㆍ현물배당을위한주주명부폐쇄(기준일)결정",
    "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261029800795"
-  },
-  {
-   "date": "20261028",
-   "corp": "SK텔레콤",
-   "title": "기업설명회(IR)개최(안내공시)",
-   "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028800090"
-  },
-  {
-   "date": "20261028",
-   "corp": "LG유플러스",
-   "title": "기업설명회(IR)개최(안내공시)",
-   "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028800449"
-  },
-  {
-   "date": "20261028",
-   "corp": "LG유플러스",
-   "title": "기업설명회(IR)개최(안내공시)",
-   "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028800443"
-  },
-  {
-   "date": "20261028",
-   "corp": "LG유플러스",
-   "title": "[첨부정정]지속가능경영보고서등관련사항(자율공시)",
-   "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20261028800411"
   }
  ],
- "mode": "open"
+ "mode": "close"
 }
