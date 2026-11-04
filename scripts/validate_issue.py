@@ -21,12 +21,30 @@ QTYPES = {"인과", "연결", "감각"}
 COMPANIES = set()
 
 
+def ref_exists(ref):
+    """기사 ref(YYYY-MM-DD#lead|k0|g0)가 실제 발행된 기사를 가리키는지."""
+    m = QREF.match(str(ref))
+    if not m:
+        return False
+    p = ROOT / "data" / "issues" / f"{m.group(1)}.json"
+    if not p.exists():
+        return False
+    d = json.loads(p.read_text(encoding="utf-8"))
+    a = m.group(2)
+    if a == "lead":
+        return bool(d.get("lead"))
+    items = d.get("kr" if a[0] == "k" else "global") or []
+    return int(a[1:]) < len(items)
+
+
 def check_companies(errors):
-    """data/companies.json: 관계 대상이 실제 회사인지, 근거가 기사(YYYY-MM-DD#..) 또는 URL인지."""
+    """data/companies.json: 관계 대상이 실제 회사인지, 근거가 실제 기사(YYYY-MM-DD#..) 또는 URL인지."""
     p = ROOT / "data" / "companies.json"
     if not p.exists():
         return
     data = json.loads(p.read_text(encoding="utf-8"))
+    if not re.match(r"^\d{4}-\d{2}-\d{2}$", str(data.get("asof", ""))):
+        errors.append("companies.json: asof(지도 기준일)는 YYYY-MM-DD")
     layers = {l["id"] for l in data.get("layers", [])}
     ids = [c["id"] for c in data.get("companies", [])]
     COMPANIES.update(ids)
@@ -44,6 +62,8 @@ def check_companies(errors):
                 errors.append(f"{w}: also 형식 오류 {a} (다른 층 id, 표시 이름, 근거)")
             elif not (QREF.match(a[2]) or str(a[2]).startswith("https://")):
                 errors.append(f"{w}: also 근거는 기사 ref 또는 https URL ({a[2]})")
+            elif QREF.match(a[2]) and not ref_exists(a[2]):
+                errors.append(f"{w}: also 근거 기사가 없음 ({a[2]})")
         for u in c.get("src", []):
             if not str(u).startswith("https://"):
                 errors.append(f"{w}: src는 https URL ({u})")
@@ -52,6 +72,8 @@ def check_companies(errors):
                 errors.append(f"{w}: 관계 형식 오류 {r}")
             elif not (QREF.match(r[3]) or str(r[3]).startswith("https://")):
                 errors.append(f"{w}: 관계 근거는 기사 ref 또는 https URL ({r[3]})")
+            elif QREF.match(r[3]) and not ref_exists(r[3]):
+                errors.append(f"{w}: 관계 근거 기사가 없음 ({r[3]})")
 
 
 def check_story(s, where, errors, need_kr=True):
