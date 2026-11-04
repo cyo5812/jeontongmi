@@ -57,9 +57,11 @@ def validate(path, glossary):
         return None, [f"JSON 문법 오류: {e}"]
     if w.get("id") != path.stem:
         errors.append(f"id({w.get('id')})가 파일명({path.stem})과 다름")
-    for k in ("id", "vol", "from", "to", "headline", "summary", "threads", "numbers", "next"):
+    for k in ("id", "vol", "from", "to", "headline", "short", "summary", "threads", "numbers", "next"):
         if w.get(k) in (None, "", []):
             errors.append(f"'{k}' 없음")
+    if w.get("short") and len(w["short"]) > 22:
+        errors.append(f"short(지난 호 카드 제목)는 22자 이내 (현재 {len(w['short'])}자)")
     try:
         f, t, i = (date.fromisoformat(w[k]) for k in ("from", "to", "id"))
         if not f <= t < i:
@@ -135,7 +137,7 @@ def main():
             continue
         axis = sorted({a for th in w["threads"] for a in th["axis"]}, key=AXES.index)
         entries.append({"id": w["id"], "vol": w["vol"], "from": w["from"], "to": w["to"],
-                        "headline": w["headline"], "axis": axis})
+                        "headline": w["headline"], "short": w.get("short", ""), "axis": axis})
         print(f"✓ {path.name}")
     if failed:
         print("\n검증 실패: weekly/index.json을 갱신하지 않았습니다.")

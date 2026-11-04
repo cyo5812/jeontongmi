@@ -68,7 +68,7 @@ def check_story(s, where, errors, need_kr=True):
         if COMPANIES and cid not in COMPANIES:
             errors.append(f"{where}: companies의 '{cid}'가 data/companies.json에 없음")
     if need_kr and not s.get("krline"):
-        errors.append(f"{where}: 'krline'(한국 시사점) 없음")
+        errors.append(f"{where}: 'krline'(시사점) 없음")
 
 
 def check_figure(f, where, errors):
@@ -183,6 +183,17 @@ def check_movers(d, errors):
                 errors.append(f"{where}: {m['name']} 등락률 {m.get('chg')}%가 market.json({row['chg']}%)과 다름")
 
 
+SHORT_MAX = 22
+
+
+def company_names():
+    """index.json에 넣을 기업 이름. 짧은 이름(short)이 있으면 그것을 쓴다."""
+    p = ROOT / "data" / "companies.json"
+    if not p.exists():
+        return {}
+    return {c["id"]: c.get("short") or c["name"] for c in json.loads(p.read_text(encoding="utf-8")).get("companies", [])}
+
+
 def validate(path, glossary):
     errors = []
     try:
@@ -191,9 +202,11 @@ def validate(path, glossary):
         return None, [f"JSON 문법 오류: {e}"]
     if d.get("date") != path.stem:
         errors.append(f"date({d.get('date')})가 파일명({path.stem})과 다름")
-    for k in ("weekday", "headline", "brief60", "lead"):
+    for k in ("weekday", "headline", "short", "brief60", "lead"):
         if not d.get(k):
             errors.append(f"'{k}' 없음")
+    if d.get("short") and len(d["short"]) > SHORT_MAX:
+        errors.append(f"short(지난 호 카드 제목)는 {SHORT_MAX}자 이내 (현재 {len(d['short'])}자)")
     if not 2 <= len(d.get("brief60") or []) <= 4:
         errors.append("brief60은 2~4줄이어야 함")
     lead = d.get("lead") or {}
@@ -222,6 +235,7 @@ def validate(path, glossary):
 def main():
     glossary = json.loads((ROOT / "data" / "glossary.json").read_text(encoding="utf-8"))
     entries, failed = [], False
+    names = company_names()
     cerr = []
     check_companies(cerr)
     if cerr:
@@ -239,9 +253,15 @@ def main():
             continue
         stories = [d["lead"]] + (d.get("kr") or []) + (d.get("global") or [])
         axis = sorted({a for s in stories for a in s.get("axis", [])}, key=["전자", "통신", "미디어"].index)
+        co = []  # 지난 호 카드의 기업 칩: 리드부터 기사 순서대로, 중복 없이
+        for s in stories:
+            for c in s.get("companies") or []:
+                n = names.get(c, c)
+                if n not in co:
+                    co.append(n)
         entries.append({
             "date": d["date"], "vol": d.get("vol"), "label": d.get("label", ""),
-            "headline": d["headline"], "axis": axis,
+            "headline": d["headline"], "short": d.get("short", ""), "axis": axis, "co": co[:3],
             "titles": [s["title"] for s in stories],
         })
         print(f"✓ {path.name}")

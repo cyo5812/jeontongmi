@@ -35,6 +35,7 @@
 | 키 | 화면 이름 | 개수 | 규칙 |
 |---|---|---|---|
 | `headline` | 제목 | 1문장 | 한 주 전체를 한 문장으로 |
+| `short` | 지난 호 카드 제목 | 22자 이내 | 한 주를 한 구절로. 예: "메모리 값이 가른 한 주" |
 | `summary` | 이번 주 3줄 | 3줄 | 흐름 하나에 한 줄. 한 줄에 사실 하나와 숫자 하나 |
 | `lens` | 이번 주의 관점 | 1~2문장(선택) | 억지로 묶이지 않으면 쓰지 않는다 |
 | `threads` | 이번 주의 흐름 | 2~3개 | 아래 참고 |
@@ -66,7 +67,7 @@
 ## 5. 데이터 형식
 
 ```
-id(발행 월요일), vol(직전 위클리 +1), from, to, readMin, headline, note(선택), summary[], lens(선택),
+id(발행 월요일), vol(직전 위클리 +1), from, to, readMin, headline, short, note(선택), summary[], lens(선택),
 threads[{axis, title, story, timeline[[ref, 요약]], why, next}],
 numbers[{value, label, note, ref}],
 checkback[{when, what, status, result, ref?}],

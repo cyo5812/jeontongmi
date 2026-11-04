@@ -112,43 +112,63 @@ async function share(btn) {
 }
 
 /* ---------- sections ---------- */
-function brief(b, id, kl = "한국 시사점") {
-  return `<article class="brief" id="${id}">
+// 두 톤 섹션 제목: "리드 스토리. 오늘 가장 깊게 볼 이슈."
+const head = (title, sub) => `<div class="section-head"><h2><b>${title}.</b> <span>${sub}</span></h2></div>`;
+function brief(b, id, kl = "국내 시사점") {
+  return `<article class="brief card-art" id="${id}">
     ${chips(b)}
     <h3>${seg(b.title)}</h3>
     <p>${rich(b.body)}</p>
     ${b.why ? `<p class="why"><b>왜 중요한가</b>${rich(b.why)}</p>` : ""}
-    ${b.krline ? `<div class="krline"><b>${kl}</b><span>${seg(b.krline)}</span></div>` : ""}
+    ${b.krline ? `<div class="krline"><b>${kl}</b><span>${rich(b.krline)}</span></div>` : ""}
     <div class="foot">${srcs(b.src)}${shareBtn(id, b.title)}</div>
   </article>`;
 }
 
 function section(id, title, sub, items, prefix, kl) {
   if (!items || !items.length) return "";
-  return `<section id="${id}"><div class="section-head"><h2>${title}</h2><p>${sub}</p></div>${items.map((b, i) => brief(b, prefix + i, kl)).join("")}</section>`;
+  return `<section id="${id}">${head(title, sub)}${items.map((b, i) => brief(b, prefix + i, kl)).join("")}</section>`;
 }
 
 /* 오늘 움직인 숫자: 전일 종가 기준으로 크게 움직인 종목·지표 3~5개를 '숫자 + 이유'로 보여준다.
    숫자는 시장 데이터(market.json)에서, 이유는 아침 발행 세션이 기사로 확인해 적는다. */
+const mvBasis = mv => {
+  const bases = mv.map(m => m.basis).filter(Boolean);
+  return bases.length ? bases.sort((a, b) => bases.filter(x => x === b).length - bases.filter(x => x === a).length)[0] : "";
+};
+const mvVal = m => {
+  const c = Number(m.chg), has = m.chg !== undefined && m.chg !== null && !isNaN(c);
+  return { cls: has ? (c > 0 ? "up" : c < 0 ? "down" : "") : "", val: m.value || (has ? `${c > 0 ? "+" : ""}${c.toFixed(2)}%` : "") };
+};
+const mvSrc = m => { const src = (m.src || [])[0]; return src ? `<a class="more" href="${safeUrl(src[1])}" target="_blank" rel="noopener">근거 · ${esc(src[0])}</a>` : ""; };
+
+// 데스크톱 레일: 세로 목록
 function moversPanel(d) {
   const mv = d.movers || [];
   if (!mv.length) return "";
-  const bases = mv.map(m => m.basis).filter(Boolean);
-  const basis = bases.length ? bases.sort((a, b) => bases.filter(x => x === b).length - bases.filter(x => x === a).length)[0] : "";
-  return `<div class="movers"><h3>오늘 움직인 숫자${basis ? `<span class="basis">${esc(basis)} 기준</span>` : ""}</h3>
-    <ol>${mv.map(m => {
-      const c = Number(m.chg), has = m.chg !== undefined && m.chg !== null && !isNaN(c);
-      const cls = has ? (c > 0 ? "up" : c < 0 ? "down" : "") : "";
-      const val = m.value || (has ? `${c > 0 ? "+" : ""}${c.toFixed(2)}%` : "");
-      const src = (m.src || [])[0];
-      return `<li><div class="mv-top"><b>${esc(m.name)}</b><span class="mv-val ${cls}">${esc(val)}</span></div>
-        <p class="mv-why"><span aria-hidden="true">›</span>${seg(m.reason)}${src ? ` <a href="${safeUrl(src[1])}" target="_blank" rel="noopener" title="${esc(src[0])}">근거 ↗</a>` : ""}</p></li>`;
+  const basis = mvBasis(mv);
+  return `<div class="movers rcard"><h3>오늘 움직인 숫자${basis ? `<span class="basis">${esc(basis)} 기준</span>` : ""}</h3>
+    <ol>${mv.map(m => { const v = mvVal(m);
+      return `<li><div class="mv-top"><b>${esc(m.name)}</b><span class="mv-val ${v.cls}">${esc(v.val)}</span></div>
+        <p class="mv-why">${seg(m.reason)} ${mvSrc(m)}</p></li>`;
     }).join("")}</ol></div>`;
+}
+
+// 모바일: 60초 브리핑 바로 아래 가로 카드
+function moversShelf(d) {
+  const mv = d.movers || [];
+  if (!mv.length) return "";
+  const basis = mvBasis(mv);
+  return `<section class="only-mob" aria-label="오늘 움직인 숫자">${head("오늘 움직인 숫자", "숫자보다 이유")}
+    <div class="shelf">${mv.map(m => { const v = mvVal(m);
+      return `<article class="card mv-card"><b class="mv-name">${esc(m.name)}</b><span class="mv-big ${v.cls}">${esc(v.val)}</span>
+        <p class="mv-why">${seg(m.reason)}</p>${mvSrc(m)}</article>`; }).join("")}</div>
+    ${basis ? `<p class="shelf-note">${esc(basis)} 기준</p>` : ""}</section>`;
 }
 
 function marketPanel(m) {
   if (!m || !m.updated) return "";
-  let h = `<details class="market"><summary>전체 종목 · 박스오피스 · 공시</summary>`;
+  let h = `<details class="market rcard"><summary>전체 종목 · 박스오피스 · 공시</summary>`;
   (m.groups || []).forEach(g => {
     h += `<table><caption>${esc(g.name)}${g.basis ? `<span class="basis">${esc(g.basis)}</span>` : ""}</caption><tbody>${g.rows.map(r => {
       const c = Number(r.chg), cls = c > 0 ? "up" : c < 0 ? "down" : "";
@@ -178,6 +198,13 @@ function calWhen(w, issueDate) {
   return `<span class="when"><span class="nb">${md}${wd}</span>${m[3] ? `<small>${esc(m[3])}</small>` : ""}</span>`;
 }
 
+// 두 톤 헤드라인: 첫 쉼표까지 진하게, 나머지는 회색
+function twoTone(h) {
+  const cut = String(h).indexOf(", ");
+  return cut > 0 ? `<span class="hb">${seg(h.slice(0, cut + 1))}</span> <span class="hs">${seg(h.slice(cut + 2))}</span>` : `<span class="hb">${seg(h)}</span>`;
+}
+const calList = d => `<ul>${d.calendar.map(([w, t, n]) => `<li>${calWhen(w, d.date)}<span>${esc(t)}${n ? `<em>${esc(n)}</em>` : ""}</span></li>`).join("")}</ul>`;
+
 function renderIssue(d, market, older, newer) {
   const L = d.lead;
   const toc = [["LEAD", "#lead", L.title]]
@@ -185,31 +212,34 @@ function renderIssue(d, market, older, newer) {
     .concat((d.global || []).map((b, i) => ["GLOBAL", "#g" + i, b.title]))
     .concat(d.quiz && d.quiz.length ? [["QUIZ", "#quiz", `오늘의 퀴즈 ${d.quiz.length}문항`]] : []);
   const dt = d.date.replaceAll("-", ".");
+  const [yy, mm, dd] = d.date.split("-").map(Number);
   document.title = `전.통.미. · ${dt}`;
   return `
   <div class="edition">
-    <h1>${seg(d.headline)}</h1>
-    <div class="meta"><span class="num">${dt} (${esc(d.weekday)})</span><span>${d.label ? esc(d.label) + " " : ""}${esc(d.vol)}호</span><span>${esc(d.readMin)}분 읽기</span>${shareBtn("", d.headline, "이번 호 공유")}</div>
+    <p class="kicker num">${mm}월 ${dd}일 ${esc(d.weekday)}요일 · ${d.label ? esc(d.label) + " " : ""}${esc(d.vol)}호 · ${esc(d.readMin)}분 읽기</p>
+    <h1>${twoTone(d.headline)}</h1>
+    <nav class="meta" aria-label="호 이동">
+      ${older ? `<a class="more back" href="?d=${esc(older.date)}" rel="prev">이전 호 ${md(older.date)}</a>` : `<span class="off">첫 호입니다</span>`}
+      ${newer ? `<a class="more" href="?d=${esc(newer.date)}" rel="next">다음 호 ${md(newer.date)}</a>` : `<span class="off">최신 호입니다</span>`}
+      ${shareBtn("", d.headline, "이번 호 공유")}
+    </nav>
   </div>
-  <nav class="issue-nav" aria-label="호 이동">
-    ${older ? `<a href="?d=${esc(older.date)}" rel="prev"><span>← 이전 호</span><b class="num">${esc(older.date.replaceAll("-", "."))}</b></a>` : `<span class="off">첫 호입니다</span>`}
-    ${newer ? `<a href="?d=${esc(newer.date)}" rel="next" class="next"><span>다음 호 →</span><b class="num">${esc(newer.date.replaceAll("-", "."))}</b></a>` : `<span class="off next">최신 호입니다</span>`}
-  </nav>
   ${weeklyCard(WEEKLY.find(w => w.id === d.date))}
   ${d.note ? `<p class="issue-note">${String(d.note).split(/(?<=[.!?])\s+/).map(t => `<span class="line">${esc(t)}</span>`).join("")}</p>` : ""}
 
-  <section class="brief60" aria-label="60초 브리핑">
+  <section class="brief60 card" aria-label="60초 브리핑">
     <div class="label">60초 브리핑</div>
-    <div>
-      <ol>${d.brief60.map(t => `<li><span>${seg(t)}</span></li>`).join("")}</ol>
-      ${d.lens ? `<p class="lens"><b>오늘의 관점</b>${seg(d.lens)}</p>` : ""}
-    </div>
+    <ol>${d.brief60.map(t => `<li><span>${seg(t)}</span></li>`).join("")}</ol>
+    ${d.lens ? `<p class="lens"><b>오늘의 관점</b>${seg(d.lens)}</p>` : ""}
   </section>
 
+  ${moversShelf(d)}
+
   <div class="layout">
-    <div>
-      <article class="lead" id="lead">
-        <div class="section-head"><h2>리드 스토리</h2><p>오늘 가장 깊게 볼 이슈</p></div>
+    <div class="colmain">
+      <section id="lead-sec">
+      ${head("리드 스토리", "오늘 가장 깊게 볼 이슈")}
+      <article class="lead card-art" id="lead">
         ${chips(L)}
         <h3>${seg(L.title)}</h3>
         <p class="dek">${seg(L.dek)}</p>
@@ -218,22 +248,25 @@ function renderIssue(d, market, older, newer) {
         ${figure(L.figure, true)}
         <h4><span class="label">WHY</span>왜 중요한가</h4>
         <p>${rich(L.why)}</p>
-        ${L.planner && L.planner.length ? `<div class="planner"><span class="label">내가 전략기획자라면</span><ol>${L.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${seg(b)}</span></li>`).join("")}</ol></div>` : ""}
+        ${L.planner && L.planner.length ? `<div class="planner"><span class="label">내가 전략기획자라면</span><ol>${L.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${rich(b)}</span></li>`).join("")}</ol></div>` : ""}
         <h4><span class="label">WATCH</span>지켜볼 것</h4>
         <p class="watch">${seg(L.watch)}</p>
         <div class="foot">${srcs(L.src)}${shareBtn("lead", L.title)}</div>
       </article>
-      ${section("kr", "국내 브리핑", `${(d.kr || []).length}건`, d.kr, "k", "산업 시사점")}
-      ${section("global", "글로벌 브리핑", `${(d.global || []).length}건 · 모두 한국 시사점 포함`, d.global, "g")}
-      ${d.figures && d.figures.length ? `<section id="numbers"><div class="section-head"><h2>숫자로 보는 산업</h2><p>오늘 기사 속 수치를 한눈에</p></div>${d.figures.map(f => figure(f)).join("")}</section>` : ""}
+      </section>
+      ${section("kr", "국내 브리핑", "산업 시사점까지", d.kr, "k", "산업 시사점")}
+      ${section("global", "글로벌 브리핑", "국내 시사점도 함께", d.global, "g", "국내 시사점")}
+      ${d.figures && d.figures.length ? `<section id="numbers">${head("숫자로 보는 산업", "오늘 기사 속 수치를 한눈에")}${d.figures.map(f => figure(f)).join("")}</section>` : ""}
       ${quizSection(d)}
+      ${d.calendar && d.calendar.length ? `<section class="only-mob" aria-label="다가오는 일정">${head("다가오는 일정", "이번 달 챙길 날짜")}<div class="cal card">${calList(d)}</div></section>` : ""}
+      ${market && market.updated ? `<div class="only-mob mob-market">${marketPanel(market)}</div>` : ""}
     </div>
-    <aside class="rail">
-      <nav class="toc" aria-label="이번 호 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav>
+    <aside class="rail only-desk" aria-label="이번 호 요약">
+      <div class="rcard"><h3>이번 호</h3><nav class="toc" aria-label="이번 호 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav></div>
       ${moversPanel(d)}
       ${marketPanel(market)}
-      ${d.calendar && d.calendar.length ? `<div class="cal"><h3>다가오는 일정</h3><ul>${d.calendar.map(([w, t, n]) => `<li>${calWhen(w, d.date)}<span>${esc(t)}${n ? `<em>${esc(n)}</em>` : ""}</span></li>`).join("")}</ul></div>` : ""}
-      <div class="gloss"><h3>용어 도움말</h3><p>점선 밑줄이 있는 용어에 마우스를 올리거나 탭하면 설명이 나옵니다.</p></div>
+      ${d.calendar && d.calendar.length ? `<div class="cal rcard"><h3>다가오는 일정</h3>${calList(d)}</div>` : ""}
+      <div class="gloss rcard"><h3>용어 도움말</h3><p>점선 밑줄이 있는 용어에 마우스를 올리거나 탭하면 설명이 나옵니다.</p></div>
     </aside>
   </div>`;
 }
@@ -252,7 +285,7 @@ function quizSection(d) {
   if (!d.quiz || !d.quiz.length) { QUIZ = null; return ""; }
   QUIZ = { date: d.date, items: d.quiz, picked: qLoad(d.date) };
   return `<section id="quiz">
-    <div class="section-head"><h2>오늘의 퀴즈</h2><p>${d.quiz.length}문항 · 1분</p></div>
+    ${head("오늘의 퀴즈", `${d.quiz.length}문항, 1분`)}
     <ol class="quiz">${d.quiz.map((q, i) => quizItem(q, i, d.date)).join("")}</ol>
     <p class="quiz-score" id="quiz-score" aria-live="polite">${quizScore()}</p>
   </section>`;
@@ -305,7 +338,7 @@ const lines = s => String(s ?? "").split(/(?<=[.!?])\s+/).map(t => `<span class=
 
 // 월요일 호 상단: 그날 발행된 위클리로 가는 카드
 const weeklyCard = w => !w ? "" : `
-  <a class="weekly-card" href="?w=${esc(w.id)}">
+  <a class="weekly-card card" href="?w=${esc(w.id)}">
     <span class="label">WEEKLY REPORT</span>
     <span class="wc-span num">${span(w)}</span>
     <b>${seg(w.headline)}</b>
@@ -323,30 +356,29 @@ function renderWeekly(w, older, newer, issues) {
     .concat([["다음 주", "#wnext", "다음 주 볼 것"]]);
   return `
   <div class="edition weekly-edition">
-    <div class="w-kicker"><span class="label">WEEKLY REPORT</span><span class="num">${span(w)}</span></div>
-    <h1>${seg(w.headline)}</h1>
-    <div class="meta"><span>위클리 ${esc(w.vol)}호</span><span>${esc(w.readMin || 5)}분 읽기</span><span>매일 호 ${inWeek.length}개 정리</span>${shareBtn("", w.headline, "이번 위클리 공유")}</div>
+    <p class="kicker num">WEEKLY REPORT · ${span(w)} · 위클리 ${esc(w.vol)}호 · ${esc(w.readMin || 5)}분 읽기</p>
+    <h1>${twoTone(w.headline)}</h1>
+    <nav class="meta" aria-label="위클리 이동">
+      ${older ? `<a class="more back" href="?w=${esc(older.id)}" rel="prev">이전 위클리 ${span(older)}</a>` : `<span class="off">첫 위클리입니다</span>`}
+      ${newer ? `<a class="more" href="?w=${esc(newer.id)}" rel="next">다음 위클리 ${span(newer)}</a>` : `<span class="off">최신 위클리입니다</span>`}
+      <span class="off">매일 호 ${inWeek.length}개 정리</span>
+      ${shareBtn("", w.headline, "이번 위클리 공유")}
+    </nav>
   </div>
-  <nav class="issue-nav" aria-label="위클리 이동">
-    ${older ? `<a href="?w=${esc(older.id)}" rel="prev"><span>← 이전 위클리</span><b class="num">${span(older)}</b></a>` : `<span class="off">첫 위클리입니다</span>`}
-    ${newer ? `<a href="?w=${esc(newer.id)}" rel="next" class="next"><span>다음 위클리 →</span><b class="num">${span(newer)}</b></a>` : `<span class="off next">최신 위클리입니다</span>`}
-  </nav>
   ${w.note ? `<p class="issue-note">${lines(w.note)}</p>` : ""}
 
-  <section class="brief60" aria-label="이번 주 3줄">
+  <section class="brief60 card" aria-label="이번 주 3줄">
     <div class="label">이번 주 3줄</div>
-    <div>
-      <ol>${w.summary.map(t => `<li><span>${seg(t)}</span></li>`).join("")}</ol>
-      ${w.lens ? `<p class="lens"><b>이번 주의 관점</b>${seg(w.lens)}</p>` : ""}
-    </div>
+    <ol>${w.summary.map(t => `<li><span>${seg(t)}</span></li>`).join("")}</ol>
+    ${w.lens ? `<p class="lens"><b>이번 주의 관점</b>${seg(w.lens)}</p>` : ""}
   </section>
 
   <div class="layout">
-    <div>
+    <div class="colmain">
       <section id="wthreads">
-        <div class="section-head"><h2>이번 주의 흐름</h2><p>여러 날에 걸쳐 이어진 이야기 ${w.threads.length}개</p></div>
+        ${head("이번 주의 흐름", `여러 날에 걸쳐 이어진 이야기 ${w.threads.length}개`)}
         ${w.threads.map((t, i) => `
-        <article class="thread" id="t${i}">
+        <article class="thread card-art" id="t${i}">
           <div class="chips">${axisBadge(t.axis)}<span class="num">${t.timeline.length}건 · ${md(t.timeline[0][0].slice(0, 10))}–${md(t.timeline[t.timeline.length - 1][0].slice(0, 10))}</span></div>
           <h3>${seg(t.title)}</h3>
           <p class="story">${rich(t.story)}</p>
@@ -358,7 +390,7 @@ function renderWeekly(w, older, newer, issues) {
       </section>
 
       <section id="wnum">
-        <div class="section-head"><h2>숫자로 본 한 주</h2><p>숫자를 누르면 원래 기사로 갑니다</p></div>
+        ${head("숫자로 본 한 주", "숫자를 누르면 원래 기사로 갑니다")}
         <div class="wnums">${w.numbers.map(x => `
           <a class="wnum" href="${refHref(x.ref)}">
             <b class="num">${esc(x.value)}</b>
@@ -369,8 +401,8 @@ function renderWeekly(w, older, newer, issues) {
       </section>
 
       ${w.checkback && w.checkback.length ? `<section id="wcheck">
-        <div class="section-head"><h2>예고했던 일정, 실제로는</h2><p>매일 호 '다가오는 일정'에 적었던 것</p></div>
-        <ul class="checkback">${w.checkback.map(c => `
+        ${head("예고했던 일정, 실제로는", "매일 호 '다가오는 일정'에 적었던 것")}
+        <ul class="checkback card">${w.checkback.map(c => `
           <li>
             ${calWhen(c.when, w.from)}
             <div><b>${esc(c.what)}</b><span class="st st-${STATUS_CLS[c.status] || "none"}">${esc(c.status)}</span>
@@ -379,15 +411,15 @@ function renderWeekly(w, older, newer, issues) {
       </section>` : ""}
 
       <section id="wnext">
-        <div class="section-head"><h2>다음 주 볼 것</h2><p>일정과 관전 포인트</p></div>
-        <ul class="wnext">${w.next.map(([when, what, pt]) => `
+        ${head("다음 주 볼 것", "일정과 관전 포인트")}
+        <ul class="wnext card">${w.next.map(([when, what, pt]) => `
           <li>${calWhen(when, w.id)}<div><b>${esc(what)}</b><p>${seg(pt)}</p></div></li>`).join("")}</ul>
       </section>
     </div>
-    <aside class="rail">
-      <nav class="toc" aria-label="위클리 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav>
-      <div class="week-issues"><h3>이번 주 매일 호</h3><ul>${inWeek.map(e => `<li><a href="?d=${esc(e.date)}"><span class="num">${md(e.date)}(${dayOf(e.date)})</span><span>${esc(e.headline)}</span></a></li>`).join("")}</ul></div>
-      <div class="gloss"><h3>위클리는 이렇게 만듭니다</h3><p>${lines("그 주에 발행된 매일 호만 다시 읽어 정리합니다. 새로운 사실은 넣지 않고, 모든 숫자와 흐름은 원래 기사로 연결됩니다.")}</p></div>
+    <aside class="rail only-desk">
+      <div class="rcard"><h3>이번 위클리</h3><nav class="toc" aria-label="위클리 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav></div>
+      <div class="week-issues rcard"><h3>이번 주 매일 호</h3><ul>${inWeek.map(e => `<li><a href="?d=${esc(e.date)}"><span class="num">${md(e.date)}(${dayOf(e.date)})</span><span>${esc(e.headline)}</span></a></li>`).join("")}</ul></div>
+      <div class="gloss rcard"><h3>위클리는 이렇게 만듭니다</h3><p>${lines("그 주에 발행된 매일 호만 다시 읽어 정리합니다. 새로운 사실은 넣지 않고, 모든 숫자와 흐름은 원래 기사로 연결됩니다.")}</p></div>
     </aside>
   </div>`;
 }
@@ -461,14 +493,14 @@ function renderMap(data, issues) {
     .join("");
   return `
   <div class="edition map-edition">
-    <div class="w-kicker"><span class="label">INDUSTRY MAP</span><span class="num">${md(data.asof)} 기준</span></div>
-    <h1>산업 지도</h1>
+    <p class="kicker num">INDUSTRY MAP · ${md(data.asof)} 기준</p>
+    <h1><span class="hb">산업 지도.</span> <span class="hs">누가 어디에 서 있고 어떻게 묶여 있나.</span></h1>
     <p class="map-dek">${lines("전자·통신·미디어 회사들이 어디에 서 있고 서로 어떻게 묶여 있는지 봅니다. 회사를 누르면 관계가 지도 위에 표시되고, 오른쪽 카드에 근거 기사가 열립니다.")}</p>
   </div>
   <div class="layout map-layout">
     <div>
       <div class="m-legend">${Object.entries(data.relTypes).filter(([k]) => k !== "계열").map(([k, v]) => `<span><i class="rt-${REL_CLS[k]}"></i><b>${k}${k === "지분" ? "·계열" : ""}</b> ${esc(v)}</span>`).join("")}<span><i class="lg-ghost"></i><b>흐린 칩</b> 주 사업이 아닌 층에 걸친 사업</span></div>
-      <div class="m-grid" role="group" aria-label="산업 지도">
+      <div class="m-grid card" role="group" aria-label="산업 지도">
         <div class="m-h"></div><div class="m-h">국내</div><div class="m-h">글로벌</div>
         ${data.layers.map(l => `
           <div class="m-layer"><b>${esc(l.name)}</b><span>${esc(l.desc)}</span></div>
@@ -498,22 +530,25 @@ function selectCompany(id, scroll) {
 
 /* ---------- archive ---------- */
 let INDEX = [], FILTER = "전체";
+// 카드: 날짜·전통미 표시 + 짧은 제목(short) + 주요 기업 2곳. 위클리는 남색 카드.
 function renderArchive(current) {
   const all = INDEX.map(e => ({ ...e, sort: e.date }))
-    .concat(WEEKLY.map(w => ({ ...w, weekly: true, sort: w.id + "w" })))   // 같은 날이면 위클리를 위에
+    .concat(WEEKLY.map(w => ({ ...w, weekly: true, sort: w.id + "w" })))   // 같은 날이면 위클리를 앞에
     .sort((a, b) => a.sort < b.sort ? 1 : -1);
   const list = all.filter(e => FILTER === "전체" || (FILTER === "위클리" ? e.weekly : !e.weekly && (e.axis || []).includes(FILTER)));
   const filters = ["전체"].concat(AXES).concat(WEEKLY.length ? ["위클리"] : []);
   document.getElementById("archive-filters").innerHTML = filters.map(a =>
     `<button type="button" id="f-${a}" aria-pressed="${a === FILTER}" data-f="${a}">${a}</button>`).join("");
   document.getElementById("archive-list").innerHTML = list.length ? list.map(e => e.weekly ? `
-    <li class="is-weekly"><a href="?w=${esc(e.id)}"${"w=" + e.id === current ? ' aria-current="page"' : ""}>
-      <span><span class="wtag">WEEKLY</span><span class="num">${span(e)}</span></span>
-      <span><h3>${esc(e.headline)}</h3></span>
+    <li><a class="card arch weekly" href="?w=${esc(e.id)}"${"w=" + e.id === current ? ' aria-current="page"' : ""}>
+      <span class="top"><span class="d">WEEKLY ${esc(e.vol)}</span><span class="d dim">${span(e)}</span></span>
+      <span class="h">${e.short ? seg(e.short) : esc(e.headline)}</span>
+      ${e.short ? `<span class="sub">${esc(e.headline)}</span>` : ""}
     </a></li>` : `
-    <li><a href="?d=${esc(e.date)}"${"d=" + e.date === current ? ' aria-current="page"' : ""}>
-      <span class="num">${esc(e.date.replaceAll("-", "."))}</span>
-      <span><h3>${esc(e.headline)}</h3></span>
+    <li><a class="card arch" href="?d=${esc(e.date)}"${"d=" + e.date === current ? ' aria-current="page"' : ""}>
+      <span class="top"><span class="d">${md(e.date)}(${dayOf(e.date)})</span>${axisBadge(e.axis)}</span>
+      <span class="h${e.short ? "" : " long"}">${e.short ? seg(e.short) : esc(e.headline)}</span>
+      <span class="co">${(e.co || []).slice(0, 2).map(c => `<span>${esc(c)}</span>`).join("")}</span>
     </a></li>`).join("") : `<li class="empty">이 분야를 다룬 호가 아직 없습니다.</li>`;
 }
 
@@ -531,7 +566,8 @@ async function main() {
     const q = new URLSearchParams(location.search);
     if (q.has("map")) {
       document.getElementById("nav-map")?.setAttribute("aria-current", "page");
-      document.querySelectorAll('.mast nav a[href^="#"]').forEach(a => { if (a.getAttribute("href") !== "#archive") a.href = "./" + a.getAttribute("href"); });
+      document.querySelectorAll('.chipnav a[href="#archive"]').forEach(a => { a.href = "./#archive"; });
+      document.querySelectorAll('.chipnav a[href^="#"]').forEach(a => { if (a.getAttribute("href") !== "#archive") a.href = "./" + a.getAttribute("href"); });
       const [data, ...issues] = await Promise.all([getJSON("data/companies.json")].concat(INDEX.map(e => getJSON(`data/issues/${e.date}.json`))));
       app.innerHTML = renderMap(data, issues);
       document.getElementById("archive").hidden = true;
@@ -540,13 +576,14 @@ async function main() {
     }
     if (q.has("w") && WEEKLY.length) {
       // 위클리 화면: 매일 호 전용 메뉴(#lead 등)는 최신 호로 보낸다
-      document.querySelectorAll('.mast nav a[href^="#"]').forEach(a => { if (a.getAttribute("href") !== "#archive") a.href = "./" + a.getAttribute("href"); });
+      document.querySelectorAll('.chipnav a[href^="#"]').forEach(a => { if (a.getAttribute("href") !== "#archive") a.href = "./" + a.getAttribute("href"); });
       const wp = WEEKLY.find(x => x.id === q.get("w")) || WEEKLY[0];
       const wd = await getJSON(`data/weekly/${wp.id}.json`);
       const wi = WEEKLY.indexOf(wp); // 최신순
       CURRENT = "w=" + wp.id;
       app.innerHTML = renderWeekly(wd, WEEKLY[wi + 1], WEEKLY[wi - 1], INDEX);
       renderArchive(CURRENT);
+      document.getElementById("nav-weekly")?.setAttribute("aria-current", "page");
       if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
       return;
     }
@@ -612,7 +649,10 @@ document.addEventListener("click", e => {
   const fb = e.target.closest(".fontswitch button");
   if (fb) { setFont(fb.dataset.font); return; }
   const b = e.target.closest("[data-f]");
-  if (b) { FILTER = b.dataset.f; renderArchive(CURRENT); }
+  if (b) {
+    FILTER = b.dataset.f; renderArchive(CURRENT);
+    if (b.closest(".chipnav")) { e.preventDefault(); document.getElementById("archive").scrollIntoView({ behavior: "smooth" }); }
+  }
 });
 const tip = document.getElementById("tip");
 document.addEventListener("pointerover", e => {

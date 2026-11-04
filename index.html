@@ -21,8 +21,8 @@
 <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="assets/favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#131a23" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f141b" media="(prefers-color-scheme: dark)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
@@ -39,14 +39,12 @@ document.head.appendChild(l)}})();
 </head>
 <body>
 <header class="mast"><div class="wrap">
-  <a class="brand" href="./">
+  <a class="brand" href="./" aria-label="전.통.미. 오늘 호로">
+    <img class="mark" src="assets/icon.svg" alt="" width="28" height="28">
     <span class="logo">전<i>.</i>통<i>.</i>미<i>.</i></span>
     <span class="season">SEASON 2</span>
-    <span class="tagline">전자·통신·미디어, 연결된 고리를 읽는 아침</span>
   </a>
   <div class="mast-right">
-    <nav><a href="#lead">리드</a><a href="#kr">국내</a><a href="#global">글로벌</a><a href="#numbers">숫자</a><a href="?w=" id="nav-weekly" hidden>위클리</a><a href="#archive">지난 호</a></nav>
-    <a href="?map" class="nav-map" id="nav-map"><svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M2.5 5.2 7.3 3l5.4 2.2L17.5 3v11.8l-4.8 2.2-5.4-2.2-4.8 2.2Z M7.3 3v11.8 M12.7 5.2V17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span>산업 지도</span></a>
     <div class="fontswitch" role="group" aria-label="글꼴 선택">
       <button type="button" id="font-plex" data-font="plex" aria-pressed="true" title="IBM Plex Sans KR">Plex</button>
       <button type="button" id="font-sandol" data-font="sandol" aria-pressed="false" title="Apple SD 산돌고딕 Neo (애플 기기 외에는 Pretendard)">산돌</button>
@@ -58,14 +56,26 @@ document.head.appendChild(l)}})();
   </div>
 </div></header>
 
+<nav class="wrap chipnav" aria-label="바로 가기">
+  <a href="#archive" data-f="전자" title="전자 축 기사가 있는 호 모아 보기"><span class="ic e">전</span>전자</a>
+  <a href="#archive" data-f="통신" title="통신 축 기사가 있는 호 모아 보기"><span class="ic t">통</span>통신</a>
+  <a href="#archive" data-f="미디어" title="미디어 축 기사가 있는 호 모아 보기"><span class="ic m">미</span>미디어</a>
+  <a href="#numbers"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>숫자</a>
+  <a href="#quiz"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01"/></svg></span>퀴즈</a>
+  <a href="?w=" id="nav-weekly" hidden><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span>위클리</a>
+  <a href="?map" id="nav-map"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14"/></svg></span>산업 지도</a>
+  <a href="#archive"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>지난 호</a>
+</nav>
+
 <main class="wrap" id="app"><p class="loading">오늘의 브리프를 불러오는 중입니다.</p></main>
 
 <section class="wrap archive" id="archive" aria-label="지난 호">
-  <div class="archive-head"><h2>지난 호</h2><div class="filters" id="archive-filters"></div></div>
+  <div class="archive-head"><h2><b>지난 호와 위클리.</b> <span>놓친 아침을 이어 읽기.</span></h2><div class="filters" id="archive-filters"></div></div>
   <ul id="archive-list"></ul>
 </section>
 
 <footer><div class="wrap">
+  <p class="foot-brand"><b>전.통.미.</b> 전자·통신·미디어, 연결된 고리를 읽는 아침</p>
   <div>
     <p><b>읽는 기준</b></p>
     <p><span class="seg">사실은 본문에,</span> <span class="seg">해석은 '왜 중요한가'와 '시사점'에 나눠 씁니다.</span> <span class="seg">수치는 원문 기사 기준이며 증권사 추정치는 확정 실적이 아닙니다.</span> <span class="seg">기사 제목 옆 <b>전·통·미</b> 표시는 그 소식이 전자·통신·미디어 중 어디에 걸쳐 있는지를 뜻합니다.</span></p>

@@ -675,6 +675,7 @@
   {
    "id": "kcc",
    "name": "방송미디어통신위원회",
+   "short": "방미통위",
    "region": "kr",
    "layer": "rules",
    "axis": [
