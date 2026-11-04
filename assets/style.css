@@ -524,7 +524,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;align-items:start}
   .only-desk{display:flex}
   .only-mob{display:none}
-  .rail{padding-top:100px;flex-direction:column;gap:14px}
+  .rail{padding-top:100px;flex-direction:column;gap:14px;align-self:stretch}
+  /* 레일 맨 아래 목차 카드만 화면에 붙어 본문 끝까지 따라온다 */
+  .rail .toc-card{position:sticky;top:calc(env(safe-area-inset-top,0px) + 68px)}
 }
 .rcard{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px 20px}
 .rcard h3{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:15px;margin:0 0 8px}
@@ -616,3 +618,14 @@ footer .foot-brand b{margin-right:6px}
   .qz{padding:16px}
   .fig{padding:18px}
 }
+
+/* 따라오는 목차: 지금 읽는 기사 표시 + 맨 위로 */
+.toc-card .toc a{transition:color .15s,background .15s}
+.toc-card .toc a[aria-current]{color:var(--fg);font-weight:600;background:var(--accent-soft);margin:0 -10px;padding-left:10px;padding-right:10px;border-radius:8px;border-top-color:transparent}
+.toc-card .toc a[aria-current] + a{border-top-color:transparent}
+.toc-card .to-top{display:inline-block;margin-top:10px;font-size:13px}
+.toc-card .to-top::after{content:" ↑"}
+@media (prefers-reduced-motion:reduce){.toc-card .toc a{transition:none}}
+
+/* 칩 5개: 휴대폰에서는 화면 폭을 나눠 한 줄에 모두 보이게 */
+@media (max-width:560px){.chipnav{gap:0}.chipnav a{flex:1 1 0;width:auto;min-width:0}}

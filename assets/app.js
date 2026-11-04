@@ -262,11 +262,11 @@ function renderIssue(d, market, older, newer) {
       ${market && market.updated ? `<div class="only-mob mob-market">${marketPanel(market)}</div>` : ""}
     </div>
     <aside class="rail only-desk" aria-label="이번 호 요약">
-      <div class="rcard"><h3>이번 호</h3><nav class="toc" aria-label="이번 호 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav></div>
       ${moversPanel(d)}
       ${marketPanel(market)}
       ${d.calendar && d.calendar.length ? `<div class="cal rcard"><h3>다가오는 일정</h3>${calList(d)}</div>` : ""}
       <div class="gloss rcard"><h3>용어 도움말</h3><p>점선 밑줄이 있는 용어에 마우스를 올리거나 탭하면 설명이 나옵니다.</p></div>
+      <div class="rcard toc-card"><h3>이번 호</h3><nav class="toc" aria-label="이번 호 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav><a class="more to-top" href="#top">맨 위로</a></div>
     </aside>
   </div>`;
 }
@@ -417,9 +417,9 @@ function renderWeekly(w, older, newer, issues) {
       </section>
     </div>
     <aside class="rail only-desk">
-      <div class="rcard"><h3>이번 위클리</h3><nav class="toc" aria-label="위클리 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav></div>
       <div class="week-issues rcard"><h3>이번 주 매일 호</h3><ul>${inWeek.map(e => `<li><a href="?d=${esc(e.date)}"><span class="num">${md(e.date)}(${dayOf(e.date)})</span><span>${esc(e.headline)}</span></a></li>`).join("")}</ul></div>
       <div class="gloss rcard"><h3>위클리는 이렇게 만듭니다</h3><p>${lines("그 주에 발행된 매일 호만 다시 읽어 정리합니다. 새로운 사실은 넣지 않고, 모든 숫자와 흐름은 원래 기사로 연결됩니다.")}</p></div>
+      <div class="rcard toc-card"><h3>이번 위클리</h3><nav class="toc" aria-label="위클리 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav><a class="more to-top" href="#top">맨 위로</a></div>
     </aside>
   </div>`;
 }
@@ -552,6 +552,22 @@ function renderArchive(current) {
     </a></li>`).join("") : `<li class="empty">이 분야를 다룬 호가 아직 없습니다.</li>`;
 }
 
+/* 따라오는 목차: 지금 화면에 걸친 기사를 표시한다 */
+let spy;
+function watchToc() {
+  spy?.disconnect();
+  const links = [...document.querySelectorAll(".toc-card .toc a")];
+  const targets = links.map(a => document.querySelector(a.getAttribute("href"))).filter(Boolean);
+  if (!targets.length || !("IntersectionObserver" in window)) return;
+  const seen = new Map();
+  spy = new IntersectionObserver(entries => {
+    entries.forEach(en => seen.set(en.target.id, en.isIntersecting));
+    const cur = targets.find(t => seen.get(t.id));
+    links.forEach(a => a.toggleAttribute("aria-current", !!cur && a.getAttribute("href") === "#" + cur.id));
+  }, { rootMargin: "-20% 0px -60% 0px" });
+  targets.forEach(t => spy.observe(t));
+}
+
 async function main() {
   const app = document.getElementById("app");
   try {
@@ -583,6 +599,7 @@ async function main() {
       CURRENT = "w=" + wp.id;
       app.innerHTML = renderWeekly(wd, WEEKLY[wi + 1], WEEKLY[wi - 1], INDEX);
       renderArchive(CURRENT);
+      watchToc();
       document.getElementById("nav-weekly")?.setAttribute("aria-current", "page");
       if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
       return;
@@ -595,6 +612,7 @@ async function main() {
     CURRENT = "d=" + pick.date;
     app.innerHTML = renderIssue(issue, pick === INDEX[0] ? market : null, INDEX[at + 1], INDEX[at - 1]);
     renderArchive(CURRENT);
+    watchToc();
     if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
   } catch (e) {
     app.innerHTML = `<p class="loading">브리프를 불러오지 못했습니다. 잠시 후 새로고침해 주세요. (${esc(e.message)})</p>`;
@@ -649,10 +667,7 @@ document.addEventListener("click", e => {
   const fb = e.target.closest(".fontswitch button");
   if (fb) { setFont(fb.dataset.font); return; }
   const b = e.target.closest("[data-f]");
-  if (b) {
-    FILTER = b.dataset.f; renderArchive(CURRENT);
-    if (b.closest(".chipnav")) { e.preventDefault(); document.getElementById("archive").scrollIntoView({ behavior: "smooth" }); }
-  }
+  if (b) { FILTER = b.dataset.f; renderArchive(CURRENT); }
 });
 const tip = document.getElementById("tip");
 document.addEventListener("pointerover", e => {
