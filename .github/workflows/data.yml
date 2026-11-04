@@ -23,17 +23,29 @@ jobs:
   fetch:
     runs-on: ubuntu-latest
     steps:
+      - name: 늦게 도착한 예비 실행은 건너뜀
+        if: github.event_name == 'schedule'
+        run: |
+          H=$(TZ=Asia/Seoul date +%H)
+          if [ "$H" -ge 8 ] && [ "$H" -lt 20 ]; then
+            echo "예약 시각(06:10)보다 늦게 도착($(TZ=Asia/Seoul date +%H:%M) KST): 아침 발행이 이미 전일 종가로 갱신했으므로 건너뜀"
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
       - uses: actions/checkout@v4
+        if: env.SKIP != '1'
       - uses: actions/setup-python@v5
+        if: env.SKIP != '1'
         with:
           python-version: "3.12"
       - name: 주가·박스오피스·공시 수집
+        if: env.SKIP != '1'
         env:
           KOBIS_KEY: ${{ secrets.KOBIS_KEY }}
           DART_KEY: ${{ secrets.DART_KEY }}
           MODE: ${{ github.event.inputs.mode || 'auto' }}
         run: python3 scripts/fetch_market.py
       - name: 변경분 커밋
+        if: env.SKIP != '1'
         run: |
           MODE=$(python3 -c "import json;print(json.load(open('data/market.json')).get('mode',''))")
           git config user.name "jeontongmi-bot"
