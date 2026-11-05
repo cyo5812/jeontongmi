@@ -36,6 +36,9 @@ a:focus-visible,button:focus-visible,select:focus-visible,.term:focus-visible{ou
 h1,h2,h3{text-wrap:balance;letter-spacing:-.02em}
 /* 의미 단위 줄바꿈(seg): 구절 하나는 한 덩어리로 다음 줄로 넘어간다 */
 .seg{display:inline-block;max-width:100%;text-wrap:balance}
+/* 문장 단위 줄바꿈(sent): 문장마다 새 줄, 안에서는 단어 단위(keep-all)로 넘김 */
+.sent{display:block;text-wrap:pretty}
+.sent + .sent{margin-top:2px}
 /* 긴 본문 단락은 양쪽 맞춤. 좁은 화면에서는 단어 사이가 벌어져서 왼쪽 정렬로 둔다 */
 @media (min-width:640px){
   .lead ul li,.lead p:not(.dek):not(.watch),.brief p,.fig .cap,.issue-note{text-align:justify;text-justify:inter-word}
@@ -54,7 +57,6 @@ h1,h2,h3{text-wrap:balance;letter-spacing:-.02em}
 .fontswitch button[data-font="plex"]{font-family:"IBM Plex Sans KR",sans-serif}
 .fontswitch button[aria-pressed="true"]{background:var(--card);color:var(--accent);box-shadow:0 1px 2px rgba(20,40,70,.12)}
 @media (prefers-reduced-motion:reduce){.fontswitch button{transition:none}}
-.season{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.1em;color:var(--accent);border:1px solid var(--sky);padding:2px 6px;border-radius:3px}
 .tagline{font-size:13px;color:var(--sub)}
 .mast nav{display:flex;gap:18px;font-size:14px;color:var(--sub)}
 .mast nav a{text-decoration:none}
@@ -447,7 +449,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .brand .mark{width:28px;height:28px;border-radius:7px;flex:none;box-shadow:0 0 0 1px var(--line)}
 .logo{font-size:22px}
 .mast-right{gap:8px}
-@media (max-width:400px){.season{display:none}}
 
 /* ② 칩 메뉴 */
 .chipnav{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-top:18px;padding-bottom:4px}

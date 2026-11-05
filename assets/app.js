@@ -9,6 +9,12 @@ const rich = s => esc(s).replace(/\[\[([a-z0-9_-]+)\|([^\]]+)\]\]/g, (m, k, t) =
   GLOSS[k] ? `<span class="term" tabindex="0" data-def="${esc(GLOSS[k])}">${t}</span>` : t);
 // 의미 단위 줄바꿈: 쉼표·마침표 뒤에서만 줄이 바뀌도록 구절을 묶는다. 구절이 줄에 다 안 들어가면 통째로 다음 줄로 넘어간다.
 const seg = s => String(s ?? "").split(/(?<=[,.!?]) +/).map(p => `<span class="seg">${rich(p)}</span>`).join(" ");
+// 문장 단위 줄바꿈(요약문용): 문장마다 새 줄, 문장 안에서는 단어 단위로 자연스럽게 넘긴다. 한 문장이면 그냥 단어 단위.
+// seg(쉼표마다 끊기)는 제목처럼 짧은 글에만 쓴다. 요약문에 쓰면 한 줄 10자 안팎의 들쭉날쭉한 줄이 생긴다.
+const sent = s => {
+  const parts = String(s ?? "").split(/(?<=[.!?])\s+/).filter(Boolean);
+  return parts.length > 1 ? parts.map(p => `<span class="sent">${rich(p)}</span>`).join("") : rich(s);
+};
 const fmt = (v, d = 0) => Number(v).toLocaleString("ko-KR", { minimumFractionDigits: d, maximumFractionDigits: d });
 const safeUrl = u => /^https?:\/\//.test(u) ? esc(u) : "#";
 
@@ -150,7 +156,7 @@ function moversPanel(d) {
   return `<div class="movers rcard"><h3>오늘 움직인 숫자${basis ? `<span class="basis">${esc(basis)} 기준</span>` : ""}</h3>
     <ol>${mv.map(m => { const v = mvVal(m);
       return `<li><div class="mv-top"><b>${esc(m.name)}</b><span class="mv-val ${v.cls}">${esc(v.val)}</span></div>
-        <p class="mv-why">${seg(m.reason)} ${mvSrc(m)}</p></li>`;
+        <p class="mv-why">${sent(m.reason)} ${mvSrc(m)}</p></li>`;
     }).join("")}</ol></div>`;
 }
 
@@ -162,7 +168,7 @@ function moversShelf(d) {
   return `<section class="only-mob" aria-label="오늘 움직인 숫자">${head("오늘 움직인 숫자", "숫자보다 이유")}
     <div class="shelf">${mv.map(m => { const v = mvVal(m);
       return `<article class="card mv-card"><b class="mv-name">${esc(m.name)}</b><span class="mv-big ${v.cls}">${esc(v.val)}</span>
-        <p class="mv-why">${seg(m.reason)}</p>${mvSrc(m)}</article>`; }).join("")}</div>
+        <p class="mv-why">${sent(m.reason)}</p>${mvSrc(m)}</article>`; }).join("")}</div>
     ${basis ? `<p class="shelf-note">${esc(basis)} 기준</p>` : ""}</section>`;
 }
 
@@ -229,8 +235,8 @@ function renderIssue(d, market, older, newer) {
 
   <section class="brief60 card" aria-label="60초 브리핑">
     <div class="label">60초 브리핑</div>
-    <ol>${d.brief60.map(t => `<li><span>${seg(t)}</span></li>`).join("")}</ol>
-    ${d.lens ? `<p class="lens"><b>오늘의 관점</b>${seg(d.lens)}</p>` : ""}
+    <ol>${d.brief60.map(t => `<li><span>${sent(t)}</span></li>`).join("")}</ol>
+    ${d.lens ? `<p class="lens"><b>오늘의 관점</b>${sent(d.lens)}</p>` : ""}
   </section>
 
   ${moversShelf(d)}
@@ -242,7 +248,7 @@ function renderIssue(d, market, older, newer) {
       <article class="lead card-art" id="lead">
         ${chips(L)}
         <h3>${seg(L.title)}</h3>
-        <p class="dek">${seg(L.dek)}</p>
+        <p class="dek">${sent(L.dek)}</p>
         <h4><span class="label">FACT</span>무슨 일이 있나</h4>
         <ul>${L.what.map(t => `<li>${rich(t)}</li>`).join("")}</ul>
         ${figure(L.figure, true)}
@@ -250,7 +256,7 @@ function renderIssue(d, market, older, newer) {
         <p>${rich(L.why)}</p>
         ${L.planner && L.planner.length ? `<div class="planner"><span class="label">내가 전략기획자라면</span><ol>${L.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${rich(b)}</span></li>`).join("")}</ol></div>` : ""}
         <h4><span class="label">WATCH</span>지켜볼 것</h4>
-        <p class="watch">${seg(L.watch)}</p>
+        <p class="watch">${sent(L.watch)}</p>
         <div class="foot">${srcs(L.src)}${shareBtn("lead", L.title)}</div>
       </article>
       </section>
@@ -369,8 +375,8 @@ function renderWeekly(w, older, newer, issues) {
 
   <section class="brief60 card" aria-label="이번 주 3줄">
     <div class="label">이번 주 3줄</div>
-    <ol>${w.summary.map(t => `<li><span>${seg(t)}</span></li>`).join("")}</ol>
-    ${w.lens ? `<p class="lens"><b>이번 주의 관점</b>${seg(w.lens)}</p>` : ""}
+    <ol>${w.summary.map(t => `<li><span>${sent(t)}</span></li>`).join("")}</ol>
+    ${w.lens ? `<p class="lens"><b>이번 주의 관점</b>${sent(w.lens)}</p>` : ""}
   </section>
 
   <div class="layout">
@@ -384,7 +390,7 @@ function renderWeekly(w, older, newer, issues) {
           <p class="story">${rich(t.story)}</p>
           <ol class="timeline">${t.timeline.map(([r, txt]) => `<li><a href="${refHref(r)}"><span class="num">${md(r.slice(0, 10))}(${dayOf(r.slice(0, 10))})</span><span>${rich(txt)}</span></a></li>`).join("")}</ol>
           <p class="why"><b>왜 중요한가</b>${rich(t.why)}</p>
-          ${t.next ? `<p class="t-next"><b>다음에 볼 것</b>${seg(t.next)}</p>` : ""}
+          ${t.next ? `<p class="t-next"><b>다음에 볼 것</b>${sent(t.next)}</p>` : ""}
           <div class="foot"><span></span>${shareBtn("t" + i, t.title)}</div>
         </article>`).join("")}
       </section>
@@ -395,7 +401,7 @@ function renderWeekly(w, older, newer, issues) {
           <a class="wnum" href="${refHref(x.ref)}">
             <b class="num">${esc(x.value)}</b>
             <span class="wn-label">${seg(x.label)}</span>
-            ${x.note ? `<span class="wn-note">${seg(x.note)}</span>` : ""}
+            ${x.note ? `<span class="wn-note">${sent(x.note)}</span>` : ""}
             <span class="wn-ref num">${md(x.ref.slice(0, 10))}호 →</span>
           </a>`).join("")}</div>
       </section>
@@ -406,14 +412,14 @@ function renderWeekly(w, older, newer, issues) {
           <li>
             ${calWhen(c.when, w.from)}
             <div><b>${esc(c.what)}</b><span class="st st-${STATUS_CLS[c.status] || "none"}">${esc(c.status)}</span>
-              <p>${seg(c.result)}${c.ref ? ` <a href="${refHref(c.ref)}" class="cb-ref">${md(c.ref.slice(0, 10))}호 →</a>` : ""}</p></div>
+              <p>${sent(c.result)}${c.ref ? ` <a href="${refHref(c.ref)}" class="cb-ref">${md(c.ref.slice(0, 10))}호 →</a>` : ""}</p></div>
           </li>`).join("")}</ul>
       </section>` : ""}
 
       <section id="wnext">
         ${head("다음 주 볼 것", "일정과 관전 포인트")}
         <ul class="wnext card">${w.next.map(([when, what, pt]) => `
-          <li>${calWhen(when, w.id)}<div><b>${esc(what)}</b><p>${seg(pt)}</p></div></li>`).join("")}</ul>
+          <li>${calWhen(when, w.id)}<div><b>${esc(what)}</b><p>${sent(pt)}</p></div></li>`).join("")}</ul>
       </section>
     </div>
     <aside class="rail only-desk">
