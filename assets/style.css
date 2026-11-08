@@ -630,3 +630,50 @@ footer .foot-brand b{margin-right:6px}
 
 /* 칩 5개: 휴대폰에서는 화면 폭을 나눠 한 줄에 모두 보이게 */
 @media (max-width:560px){.chipnav{gap:0}.chipnav a{flex:1 1 0;width:auto;min-width:0}}
+
+/* ---------- 지난 호: 메인 하단(이번 주) + 전체 페이지(?archive) ---------- */
+.ar-all{margin-left:auto;font-size:14px;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap}
+.ar-all:hover{text-decoration:underline;text-underline-offset:3px}
+.archive li a.arch.all{background:transparent;border:1.5px dashed var(--accent-3);box-shadow:none;color:var(--accent)}
+.arch.all .h{color:var(--fg)}
+.arch.all .go{font-size:26px;font-weight:600;line-height:1}
+.archive li a.arch.all:hover{border-style:solid;border-color:var(--sky)}
+
+.ar-edition{margin-bottom:8px}
+.ar-month{margin-top:28px;border-top:2px solid var(--fg)}
+.ar-month summary{display:flex;align-items:baseline;gap:12px;padding:16px 0 6px;cursor:pointer;list-style:none}
+.ar-month summary::-webkit-details-marker{display:none}
+.ar-month summary h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.ar-month summary .num{font-size:13px;color:var(--muted)}
+.ar-month summary::after{content:"";margin-left:auto;width:9px;height:9px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .2s}
+.ar-month[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+.ar-week{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px;padding:18px 0;border-top:1px solid var(--line)}
+.ar-month summary + .ar-week{border-top:0}
+.ar-wk{align-self:start;position:sticky;top:76px;display:flex;flex-direction:column;gap:8px;padding:18px;border-radius:14px;background:var(--navy);color:var(--bg);text-decoration:none}
+.ar-wk .label{color:var(--sky)}
+.ar-wk .ar-span{font-size:12.5px;opacity:.75}
+.ar-wk b{font-size:17px;line-height:1.45;letter-spacing:-.015em}
+.ar-wk .ar-go{margin-top:4px;font-size:13px;font-weight:600;color:var(--sky)}
+.ar-wk:hover .ar-go{text-decoration:underline;text-underline-offset:3px}
+.ar-wk.pending{background:transparent;color:var(--fg);border:1.5px dashed var(--line)}
+.ar-wk.pending .label{color:var(--muted)}
+.ar-wk.pending b{font-size:15px;font-weight:600;color:var(--sub)}
+.ar-rows{list-style:none;margin:0;padding:0}
+.ar-row{display:grid;grid-template-columns:78px minmax(0,1fr) auto;gap:14px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--fg)}
+.ar-rows li:last-child .ar-row{border-bottom:0}
+.ar-d{font-size:14px;font-weight:600;color:var(--accent);white-space:nowrap}
+.ar-d small{font-size:12px;font-weight:500;color:var(--muted);margin-left:1px}
+.ar-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.ar-t b{font-size:15.5px;line-height:1.45;letter-spacing:-.01em}
+.ar-h{font-size:13px;line-height:1.5;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ar-co{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:220px}
+.ar-co span{font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--soft);color:var(--sub);white-space:nowrap}
+.ar-row:hover b{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){.ar-month summary::after{transition:none}}
+@media (max-width:760px){
+  .ar-week{grid-template-columns:minmax(0,1fr);gap:10px}
+  .ar-wk{position:static;padding:14px 16px}
+  .ar-row{grid-template-columns:62px minmax(0,1fr);gap:10px}
+  .ar-co{grid-column:2;justify-content:flex-start;max-width:none}
+  .ar-h{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+}

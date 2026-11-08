@@ -537,25 +537,99 @@ function selectCompany(id, scroll) {
 /* ---------- archive ---------- */
 let INDEX = [], FILTER = "전체";
 // 카드: 날짜·전통미 표시 + 짧은 제목(short) + 주요 기업 2곳. 위클리는 남색 카드.
-function renderArchive(current) {
-  const all = INDEX.map(e => ({ ...e, sort: e.date }))
-    .concat(WEEKLY.map(w => ({ ...w, weekly: true, sort: w.id + "w" })))   // 같은 날이면 위클리를 앞에
-    .sort((a, b) => a.sort < b.sort ? 1 : -1);
-  const list = all.filter(e => FILTER === "전체" || (FILTER === "위클리" ? e.weekly : !e.weekly && (e.axis || []).includes(FILTER)));
-  const filters = ["전체"].concat(AXES).concat(WEEKLY.length ? ["위클리"] : []);
-  document.getElementById("archive-filters").innerHTML = filters.map(a =>
-    `<button type="button" id="f-${a}" aria-pressed="${a === FILTER}" data-f="${a}">${a}</button>`).join("");
-  document.getElementById("archive-list").innerHTML = list.length ? list.map(e => e.weekly ? `
-    <li><a class="card arch weekly" href="?w=${esc(e.id)}"${"w=" + e.id === current ? ' aria-current="page"' : ""}>
-      <span class="top"><span class="d">WEEKLY ${esc(e.vol)}</span><span class="d dim">${span(e)}</span></span>
-      <span class="h">${e.short ? seg(e.short) : esc(e.headline)}</span>
-      ${e.short ? `<span class="sub">${esc(e.headline)}</span>` : ""}
-    </a></li>` : `
+/* 지난 호: 주 단위로 묶는다.
+   위클리가 있는 주는 그 위클리의 기간(from~to)으로, 아직 위클리가 없는 최근 주는 월~일로 묶는다. */
+// 날짜 계산은 현지 날짜로만 한다(toISOString은 UTC로 바꿔서 한국 시간에서 하루가 밀린다)
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const addDays = (s, n) => { const d = new Date(s + "T00:00:00"); d.setDate(d.getDate() + n); return ymd(d); };
+const mondayOf = s => { const d = new Date(s + "T00:00:00"); return addDays(s, -((d.getDay() + 6) % 7)); };
+function weekGroups() {
+  const groups = WEEKLY.map(w => ({ weekly: w, from: w.from, to: w.to, issues: INDEX.filter(e => e.date >= w.from && e.date <= w.to) }));
+  INDEX.filter(e => !groups.some(g => e.date >= g.from && e.date <= g.to)).forEach(e => {
+    const from = mondayOf(e.date), to = addDays(from, 6);
+    let g = groups.find(x => !x.weekly && x.from === from);
+    if (!g) groups.push(g = { weekly: null, from, to, next: addDays(from, 7), issues: [] });
+    g.issues.push(e);
+  });
+  groups.forEach(g => g.issues.sort((a, b) => a.date < b.date ? 1 : -1));
+  return groups.filter(g => g.issues.length || g.weekly).sort((a, b) => a.from < b.from ? 1 : -1);
+}
+
+const archCard = (e, current) => `
     <li><a class="card arch" href="?d=${esc(e.date)}"${"d=" + e.date === current ? ' aria-current="page"' : ""}>
       <span class="top"><span class="d">${md(e.date)}(${dayOf(e.date)})</span>${axisBadge(e.axis)}</span>
       <span class="h${e.short ? "" : " long"}">${e.short ? seg(e.short) : esc(e.headline)}</span>
       <span class="co">${(e.co || []).slice(0, 2).map(c => `<span>${esc(c)}</span>`).join("")}</span>
-    </a></li>`).join("") : `<li class="empty">이 분야를 다룬 호가 아직 없습니다.</li>`;
+    </a></li>`;
+const weeklyArch = (w, current) => `
+    <li><a class="card arch weekly" href="?w=${esc(w.id)}"${"w=" + w.id === current ? ' aria-current="page"' : ""}>
+      <span class="top"><span class="d">WEEKLY ${esc(w.vol)}</span><span class="d dim">${span(w)}</span></span>
+      <span class="h">${w.short ? seg(w.short) : esc(w.headline)}</span>
+      ${w.short ? `<span class="sub">${esc(w.headline)}</span>` : ""}
+    </a></li>`;
+
+// 메인 하단: 최신 위클리 + 가장 최근 주의 매일 호만. 그 전은 '전체 지난 호' 페이지로.
+function renderArchive(current) {
+  const g = weekGroups()[0];
+  const latestW = WEEKLY[0];
+  const recent = g ? g.issues : [];
+  const total = INDEX.length + WEEKLY.length;
+  document.getElementById("archive-filters").innerHTML = "";
+  document.getElementById("archive-list").innerHTML =
+    (latestW ? weeklyArch(latestW, current) : "") +
+    recent.map(e => archCard(e, current)).join("") +
+    `<li><a class="card arch all" href="?archive">
+      <span class="top"><span class="d">ARCHIVE</span></span>
+      <span class="h">전체 지난 호 보기</span>
+      <span class="sub">매일 호 ${INDEX.length}개 · 위클리 ${WEEKLY.length}개를 주 단위로 모아 봅니다</span>
+      <span class="go">→</span>
+    </a></li>`;
+  if (!total) document.getElementById("archive-list").innerHTML = `<li class="empty">아직 지난 호가 없습니다.</li>`;
+}
+
+// 전체 지난 호 페이지(?archive): 달 → 주 → 매일 호. 주마다 왼쪽에 그 주의 위클리.
+function renderArchivePage() {
+  const groups = weekGroups();
+  const months = [];
+  groups.forEach(g => {
+    const key = g.to.slice(0, 7);
+    let m = months.find(x => x.key === key);
+    if (!m) months.push(m = { key, groups: [] });
+    m.groups.push(g);
+  });
+  document.title = "전.통.미. · 지난 호";
+  const first = INDEX.length ? INDEX[INDEX.length - 1].date : "";
+  const row = e => `
+        <li><a class="ar-row" href="?d=${esc(e.date)}">
+          <span class="ar-d num">${md(e.date)}<small>(${dayOf(e.date)})</small></span>
+          <span class="ar-t"><b>${e.short ? esc(e.short) : esc(e.headline)}</b><span class="ar-h">${esc(e.headline)}</span></span>
+          <span class="ar-co">${(e.co || []).slice(0, 3).map(c => `<span>${esc(c)}</span>`).join("")}</span>
+        </a></li>`;
+  const week = g => `
+      <div class="ar-week">
+        ${g.weekly ? `<a class="ar-wk" href="?w=${esc(g.weekly.id)}">
+            <span class="label">WEEKLY ${esc(g.weekly.vol)}</span>
+            <span class="ar-span num">${span(g)}</span>
+            <b>${esc(g.weekly.short || g.weekly.headline)}</b>
+            <span class="ar-go">위클리 읽기 →</span>
+          </a>` : `<div class="ar-wk pending">
+            <span class="label">이번 주</span>
+            <span class="ar-span num">${md(g.from)} – ${md(g.to)}</span>
+            <b>위클리는 ${md(g.next)}(월) 아침에 나옵니다</b>
+          </div>`}
+        <ul class="ar-rows">${g.issues.map(row).join("")}</ul>
+      </div>`;
+  return `
+  <div class="edition map-edition ar-edition">
+    <div class="w-kicker"><span class="label">ARCHIVE</span><span class="num">매일 호 ${INDEX.length} · 위클리 ${WEEKLY.length}</span></div>
+    <h1>지난 호</h1>
+    <p class="map-dek">${first ? `${first.slice(0, 4)}년 ${+first.slice(5, 7)}월 ${+first.slice(8)}일 시범판부터 지금까지.` : ""} 한 주를 위클리와 그 주의 매일 호로 묶었습니다.</p>
+  </div>
+  ${months.map((m, i) => `
+  <details class="ar-month"${i < 2 ? " open" : ""}>
+    <summary><h2>${m.key.slice(0, 4)}년 ${+m.key.slice(5)}월</h2><span class="num">${m.groups.reduce((n, g) => n + g.issues.length, 0)}개 호</span></summary>
+    ${m.groups.map(week).join("")}
+  </details>`).join("")}`;
 }
 
 /* 따라오는 목차: 지금 화면에 걸친 기사를 표시한다 */
@@ -586,6 +660,12 @@ async function main() {
     if (nav && WEEKLY.length) nav.hidden = false;
     CW = Math.round(Math.max(320, Math.min(640, app.clientWidth)));
     const q = new URLSearchParams(location.search);
+    if (q.has("archive")) {
+      document.querySelectorAll('.chipnav a[href^="#"]').forEach(a => { a.href = a.getAttribute("href") === "#archive" ? "?archive" : "./" + a.getAttribute("href"); });
+      app.innerHTML = renderArchivePage();
+      document.getElementById("archive").hidden = true;
+      return;
+    }
     if (q.has("map")) {
       document.getElementById("nav-map")?.setAttribute("aria-current", "page");
       document.querySelectorAll('.chipnav a[href="#archive"]').forEach(a => { a.href = "./#archive"; });
@@ -673,7 +753,7 @@ document.addEventListener("click", e => {
   const fb = e.target.closest(".fontswitch button");
   if (fb) { setFont(fb.dataset.font); return; }
   const b = e.target.closest("[data-f]");
-  if (b) { FILTER = b.dataset.f; renderArchive(CURRENT); }
+  if (b) { FILTER = b.dataset.f; renderArchive(CURRENT); } // 필터는 없어졌지만 예전 버튼이 남아 있을 때를 위해 둔다
 });
 const tip = document.getElementById("tip");
 document.addEventListener("pointerover", e => {
