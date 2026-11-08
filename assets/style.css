@@ -677,3 +677,20 @@ footer .foot-brand b{margin-right:6px}
   .ar-co{grid-column:2;justify-content:flex-start;max-width:none}
   .ar-h{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 }
+
+/* 지난 호 가로 줄: 화살표·양 끝 흐림·끌기 */
+.ar-nav{display:flex;gap:8px}
+.ar-nav[hidden]{display:none}
+.ar-btn{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer;box-shadow:var(--shadow);transition:background .15s,color .15s,border-color .15s,opacity .15s}
+.ar-btn:hover:not(:disabled){border-color:var(--sky);color:var(--accent)}
+.ar-btn:disabled{opacity:.35;cursor:default;box-shadow:none}
+.ar-btn:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.ar-all + .ar-nav{margin-left:4px}
+#archive-list{--fl:0px;--fr:0px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%)}
+#archive-list.fade-l{--fl:48px}
+#archive-list.fade-r{--fr:64px}
+@media (hover:hover) and (pointer:fine){#archive-list{cursor:grab}}
+#archive-list.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+#archive-list.dragging a{pointer-events:none}
+@media (hover:none),(pointer:coarse){.ar-nav{display:none}}
+@media (prefers-reduced-motion:reduce){.ar-btn{transition:none}}

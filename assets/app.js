@@ -585,6 +585,58 @@ function renderArchive(current) {
       <span class="go">→</span>
     </a></li>`;
   if (!total) document.getElementById("archive-list").innerHTML = `<li class="empty">아직 지난 호가 없습니다.</li>`;
+  const list = document.getElementById("archive-list");
+  setupScroller(list, document.getElementById("ar-nav"));
+  // 현재 보고 있는 호의 카드가 화면 밖에 있을 때만 보이도록 당긴다(보이면 맨 앞에서 시작)
+  const cur = list.querySelector('[aria-current="page"]');
+  if (cur) {
+    const li = cur.parentElement, right = li.offsetLeft - list.offsetLeft + li.offsetWidth;
+    if (right > list.clientWidth) list.scrollLeft = right - list.clientWidth + 24;
+  }
+  list.dispatchEvent(new Event("scroll"));
+}
+
+/* 가로 카드 줄: 화살표 버튼, 양 끝 흐림, 마우스로 끌어서 넘기기.
+   손가락 스와이프는 브라우저 기본 동작을 그대로 쓰고, 마우스(PC)에만 끌기를 더한다. */
+function setupScroller(list, nav) {
+  if (!list || list.dataset.scroller) return;
+  list.dataset.scroller = "1";
+  const btns = nav ? [...nav.querySelectorAll(".ar-btn")] : [];
+  const update = () => {
+    const max = list.scrollWidth - list.clientWidth - 2;
+    const atStart = list.scrollLeft <= 2, atEnd = list.scrollLeft >= max;
+    list.classList.toggle("fade-l", !atStart);
+    list.classList.toggle("fade-r", !atEnd && max > 0);
+    if (nav) nav.hidden = max <= 0;
+    btns.forEach(b => { b.disabled = +b.dataset.dir < 0 ? atStart : atEnd; });
+  };
+  btns.forEach(b => b.addEventListener("click", () => {
+    const card = list.querySelector("li");
+    const step = card ? Math.max(card.getBoundingClientRect().width + 14, list.clientWidth - 120) : list.clientWidth * 0.8;
+    list.scrollBy({ left: +b.dataset.dir * step, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }));
+  // 마우스로 끌기: 5px 넘게 움직이면 끌기로 보고, 그때 놓은 클릭은 링크로 넘어가지 않게 막는다
+  let down = null, moved = false;
+  list.addEventListener("pointerdown", e => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    down = { x: e.clientX, left: list.scrollLeft }; moved = false;
+  });
+  window.addEventListener("pointermove", e => {
+    if (!down) return;
+    const dx = e.clientX - down.x;
+    if (!moved && Math.abs(dx) > 5) { moved = true; list.classList.add("dragging"); }
+    if (moved) { list.scrollLeft = down.left - dx; e.preventDefault(); }
+  });
+  window.addEventListener("pointerup", () => {
+    if (!down) return;
+    down = null;
+    setTimeout(() => list.classList.remove("dragging"), 0);
+  });
+  list.addEventListener("click", e => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+  list.addEventListener("dragstart", e => e.preventDefault());
+  list.addEventListener("scroll", update, { passive: true });
+  window.addEventListener("resize", update);
+  update();
 }
 
 // 전체 지난 호 페이지(?archive): 달 → 주 → 매일 호. 주마다 왼쪽에 그 주의 위클리.
