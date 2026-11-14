@@ -8,6 +8,8 @@
 |---|---|---|
 | 06:07 | GitHub Actions (`data.yml`) | 주가·박스오피스·공시를 모아 `data/market.json`에 커밋 |
 | 06:37 | Claude 예약 작업 | `EDITORIAL.md`대로 뉴스를 검색·선별·분석해 `data/issues/<날짜>.json` 작성, 검증 후 푸시 |
+| 금요일 05:42 | Claude 예약 작업 | `WEEKLY.md`대로 위클리(지난 금~목) 작성, 산업 지도 갱신 |
+| 주말 → 월요일 | 편집장 + Claude | `ANALYSIS.md`대로 월요 콘텐츠 분석회 작성, 일요일 밤까지 예약 발행 |
 | 푸시 직후 | GitHub Pages | 사이트 자동 갱신 |
 
 ## 폴더 구조
@@ -20,9 +22,13 @@ data/issues/*.json      하루 한 호
 data/index.json         보관함 목록 (validate_issue.py가 자동 생성)
 data/glossary.json      용어 도움말
 data/market.json        시장 데이터 (Actions가 자동 갱신)
+data/analysis/*.json    월요 콘텐츠 분석회 한 회
+data/analysis/index.json 분석회 목록 (validate_analysis.py가 자동 생성)
 scripts/validate_issue.py   발행 전 검증 + index.json 재생성
 scripts/fetch_market.py     시장 데이터 수집
 EDITORIAL.md            편집 지침 (발행 세션이 매일 읽음)
+ANALYSIS.md             월요 콘텐츠 분석회 지침
+scripts/validate_analysis.py  분석회 검증 + analysis/index.json 재생성
 ```
 
 ## 처음 설정

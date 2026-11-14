@@ -2,7 +2,7 @@ name: 발행본 검증
 
 on:
   push:
-    paths: ["data/issues/**", "data/weekly/**", "data/glossary.json", "data/companies.json", "scripts/validate_issue.py", "scripts/validate_weekly.py"]
+    paths: ["data/issues/**", "data/weekly/**", "data/analysis/**", "data/glossary.json", "data/companies.json", "scripts/validate_issue.py", "scripts/validate_weekly.py", "scripts/validate_analysis.py"]
   pull_request:
 
 jobs:
@@ -19,3 +19,6 @@ jobs:
       - run: python3 scripts/validate_weekly.py
       - name: weekly/index.json이 최신인지 확인
         run: git diff --exit-code data/weekly/index.json || (echo "validate_weekly.py를 실행하고 weekly/index.json을 함께 커밋하세요" && exit 1)
+      - run: python3 scripts/validate_analysis.py
+      - name: analysis/index.json이 최신인지 확인
+        run: git diff --exit-code data/analysis/index.json || (echo "validate_analysis.py를 실행하고 analysis/index.json을 함께 커밋하세요" && exit 1)

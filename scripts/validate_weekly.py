@@ -66,10 +66,12 @@ def validate(path, glossary):
         f, t, i = (date.fromisoformat(w[k]) for k in ("from", "to", "id"))
         if not f <= t < i:
             errors.append("날짜 순서는 from ≤ to < id(발행일)여야 함")
-        if (t - f).days > 7:
-            errors.append("기간(from~to)은 최대 8일")
-        if i.weekday() != 0:
-            print(f"   ! {path.name}: 발행일이 월요일이 아님(경고)")
+        # 월요일→금요일 발행 전환호(2026-11-20)만 11일을 허용한다
+        limit = 10 if w.get("transition") is True else 7
+        if (t - f).days > limit:
+            errors.append(f"기간(from~to)은 최대 {limit + 1}일")
+        if i.weekday() != 4:
+            print(f"   ! {path.name}: 발행일이 금요일이 아님(경고). 2026-11-16 이전 위클리는 월요일 발행이라 정상")
     except (KeyError, ValueError, TypeError):
         errors.append("from/to/id는 YYYY-MM-DD 형식이어야 함")
         return w, errors

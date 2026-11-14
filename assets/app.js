@@ -231,6 +231,7 @@ function renderIssue(d, market, older, newer) {
     </nav>
   </div>
   ${weeklyCard(WEEKLY.find(w => w.id === d.date))}
+  ${analysisCard(ANALYSIS.find(f => f.id === d.date))}
   ${d.note ? `<p class="issue-note">${String(d.note).split(/(?<=[.!?])\s+/).map(t => `<span class="line">${esc(t)}</span>`).join("")}</p>` : ""}
 
   <section class="brief60 card" aria-label="60초 브리핑">
@@ -342,7 +343,7 @@ const dayOf = s => WD[new Date(s + "T00:00:00").getDay()];
 const refHref = r => { const [d, a] = String(r).split("#"); return `?d=${esc(d)}${a ? "#" + esc(a) : ""}`; };
 const lines = s => String(s ?? "").split(/(?<=[.!?])\s+/).map(t => `<span class="line">${esc(t)}</span>`).join("");
 
-// 월요일 호 상단: 그날 발행된 위클리로 가는 카드
+// 금요일 호 상단: 그날 발행된 위클리로 가는 카드
 const weeklyCard = w => !w ? "" : `
   <a class="weekly-card card" href="?w=${esc(w.id)}">
     <span class="label">WEEKLY REPORT</span>
@@ -426,6 +427,108 @@ function renderWeekly(w, older, newer, issues) {
       <div class="week-issues rcard"><h3>이번 주 매일 호</h3><ul>${inWeek.map(e => `<li><a href="?d=${esc(e.date)}"><span class="num">${md(e.date)}(${dayOf(e.date)})</span><span>${esc(e.headline)}</span></a></li>`).join("")}</ul></div>
       <div class="gloss rcard"><h3>위클리는 이렇게 만듭니다</h3><p>${lines("그 주에 발행된 매일 호만 다시 읽어 정리합니다. 새로운 사실은 넣지 않고, 모든 숫자와 흐름은 원래 기사로 연결됩니다.")}</p></div>
       <div class="rcard toc-card"><h3>이번 위클리</h3><nav class="toc" aria-label="위클리 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav><a class="more to-top" href="#top">맨 위로</a></div>
+    </aside>
+  </div>`;
+}
+
+
+/* ---------- 월요 콘텐츠 분석회 ---------- */
+// 매주 월요일, 주말에 만든 대중이 사랑한 작품 하나를 산업과 전략기획의 눈으로 해부한다.
+// 편집장이 작품과 질문(앵글)을 정하고, 가설을 검증한 뒤 편집장 노트로 닫는다.
+let ANALYSIS = [], ANALYSIS_ALL = [];
+const today = () => ymd(new Date());
+const kdate = s => `${+s.slice(5, 7)}월 ${+s.slice(8)}일`;
+const VERDICT_CLS = { "지지": "ok", "상당 부분 지지": "ok", "약하게 지지": "wait", "판단 보류": "none", "반대": "chg" };
+
+// 월요일 호 상단: 그날 발행된 분석회로 가는 카드(위클리 카드 아래)
+const analysisCard = f => !f ? "" : `
+  <a class="an-card card" href="?a=${esc(f.id)}">
+    <span class="label">월요 콘텐츠 분석회</span>
+    <span class="wc-span">${esc(f.kind)} · ${esc(f.work)}</span>
+    <b>${seg(f.headline)}</b>
+    <span class="wc-go">이번 주 작품 해부 읽기 →</span>
+  </a>`;
+
+function renderAnalysis(f, older, newer) {
+  const preview = f.id > today();
+  document.title = `월요 콘텐츠 분석회 · ${f.work}`;
+  const toc = [["질문", "#fq", "이번 주의 질문"], ["흐름", "#ftime", "한눈에 보기"], ["검증", "#ftest", "가설 검증"]]
+    .concat(f.money ? [["돈", "#fmoney", "돈은 어디로 가나"]] : [])
+    .concat([["전략", "#fplan", "전략기획가라면"], ["노트", "#fnote", "편집장 노트"]]);
+  const paras = s => String(s ?? "").split(/\n\n+/).map(p => `<p>${lines(p)}</p>`).join("");
+  return `
+  ${preview ? `<p class="issue-note f-preview"><span class="line">예약 발행 미리보기입니다.</span><span class="line">${kdate(f.id)} 월요일 아침에 공개됩니다.</span></p>` : ""}
+  <div class="edition an-edition">
+    <p class="kicker num">월요 콘텐츠 분석회 · ${kdate(f.id)} · ${esc(f.vol)}호 · ${esc(f.kind)} · ${esc(f.readMin || 7)}분 읽기</p>
+    <h1>${twoTone(f.headline)}</h1>
+    <p class="f-work"><span class="label">이번 주 작품</span><b>${esc(f.work)}</b><span>${esc(f.maker)}${f.year ? ` · ${esc(f.year)}` : ""}</span></p>
+    <nav class="meta" aria-label="분석회 이동">
+      ${older ? `<a class="more back" href="?a=${esc(older.id)}" rel="prev">이전 회 ${esc(older.work)}</a>` : `<span class="off">첫 회입니다</span>`}
+      ${newer ? `<a class="more" href="?a=${esc(newer.id)}" rel="next">다음 회 ${esc(newer.work)}</a>` : `<span class="off">최신 회입니다</span>`}
+      ${shareBtn("", f.headline, "이번 회 공유")}
+    </nav>
+  </div>
+
+  <section class="brief60 card" aria-label="이번 주 3줄">
+    <div class="label">이번 주 3줄</div>
+    <ol>${f.summary.map(t => `<li><span>${sent(t)}</span></li>`).join("")}</ol>
+    ${f.lens ? `<p class="lens"><b>이번 주의 판정</b>${sent(f.lens)}</p>` : ""}
+  </section>
+
+  <div class="layout">
+    <div class="colmain">
+      <section id="fq">
+        ${head("이번 주의 질문", "편집장이 던진 앵글")}
+        <blockquote class="f-question"><p>${lines(f.question)}</p><cite>편집장 ${esc(f.note.by)}</cite></blockquote>
+        ${f.layers && f.layers.length ? `<p class="f-intro">${lines("이 질문을 검증하기 위해 '고착화된 흥행 흐름'을 세 층으로 나눠 봤다.")}</p>
+        <ol class="f-layers">${f.layers.map(([a, b]) => `<li><b>${esc(a)}</b><span>${esc(b)}</span></li>`).join("")}</ol>` : ""}
+      </section>
+
+      ${f.timeline && f.timeline.length ? `<section id="ftime">
+        ${head("한눈에 보기", "무슨 일이 어떤 순서로 일어났나")}
+        <ol class="f-timeline">${f.timeline.map(([d, t]) => `<li><span class="num">${esc(d)}</span><span>${esc(t)}</span></li>`).join("")}</ol>
+        ${f.timelineNote ? `<p class="f-body">${lines(f.timelineNote)}</p>` : ""}
+      </section>` : ""}
+
+      <section id="ftest">
+        ${head("가설 검증", "지지하는 사실과 반대하는 사실을 나란히")}
+        ${f.tests.map((t, i) => `
+        <article class="f-test card-art" id="ft${i}">
+          <div class="f-test-head"><span class="label">${f.tests.length > 1 ? `층 ${i + 1}` : "검증"}</span><h3>${esc(t.title)}</h3><span class="st st-${VERDICT_CLS[t.verdict] || "none"}">${esc(t.verdict)}</span></div>
+          <div class="f-cols">
+            <div><h4>${esc(t.proLabel || "지지하는 사실")}</h4><ul>${t.pro.map(x => `<li>${rich(x)}</li>`).join("")}</ul></div>
+            <div><h4>${esc(t.conLabel || "반대하는 사실")}</h4><ul>${t.con.map(x => `<li>${rich(x)}</li>`).join("")}</ul></div>
+          </div>
+          <p class="why"><b>판정</b>${rich(t.judge)}</p>
+        </article>`).join("")}
+        <div class="f-verdict card"><span class="label">종합 판정</span><p>${lines(f.conclusion)}</p></div>
+      </section>
+
+      ${f.money ? `<section id="fmoney">
+        ${head("돈은 어디로 가나", "권리와 수익의 흐름")}
+        ${f.money.rows && f.money.rows.length ? `<div class="f-table"><table><thead><tr><th>권리·수익</th><th>누구에게</th><th>확인 수준</th></tr></thead><tbody>${f.money.rows.map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td><span class="st st-${c === "미확인" ? "none" : c === "보도로 확인" ? "ok" : "wait"}">${esc(c)}</span></td></tr>`).join("")}</tbody></table></div>` : ""}
+        ${f.money.body ? `<p class="f-body">${lines(f.money.body)}</p>` : ""}
+        ${f.money.compare ? `<p class="f-body">${lines(f.money.compare)}</p>` : ""}
+        ${f.money.take ? `<p class="lens f-take"><b>우리 해석</b>${sent(f.money.take)}</p>` : ""}
+      </section>` : ""}
+
+      <section id="fplan">
+        ${head("전략기획가라면", "각자의 자리에서 다음 수")}
+        <div class="planner"><span class="label">내가 전략기획자라면</span><ol>${f.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${sent(b)}</span></li>`).join("")}</ol></div>
+        ${f.questions && f.questions.length ? `<div class="f-questions"><h4>토론 질문</h4><ul>${f.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul></div>` : ""}
+      </section>
+
+      <section id="fnote">
+        ${head("편집장 노트", "이 회를 고른 사람의 시선")}
+        <div class="f-note card">${paras(f.note.text)}<p class="f-sign">— 편집장 ${esc(f.note.by)}</p></div>
+      </section>
+
+      ${f.unknown && f.unknown.length ? `<section class="f-unknown"><h4>아직 확인하지 못한 것</h4><ul>${f.unknown.map(u => `<li>${esc(u)}</li>`).join("")}</ul><p>${lines("공개 자료로 확인되지 않은 것은 본문에서 단정하지 않았습니다. 확인되면 다음 회에서 바로잡습니다.")}</p></section>` : ""}
+      <div class="foot f-src">${srcs(f.src)}</div>
+    </div>
+    <aside class="rail only-desk">
+      <div class="gloss rcard"><h3>월요 콘텐츠 분석회는</h3><p>${lines("매주 월요일, 대중이 사랑한 작품 하나를 골라 산업과 전략기획의 눈으로 해부합니다. 편집장이 작품과 질문을 정하고, 지지하는 사실과 반대하는 사실을 나란히 놓고 검증합니다.")}</p></div>
+      <div class="rcard toc-card"><h3>이번 회</h3><nav class="toc" aria-label="분석회 목차">${toc.map(([k, h, t]) => `<a href="${h}"><span>${k}</span>${esc(t)}</a>`).join("")}</nav><a class="more to-top" href="#top">맨 위로</a></div>
     </aside>
   </div>`;
 }
@@ -538,17 +641,19 @@ function selectCompany(id, scroll) {
 let INDEX = [], FILTER = "전체";
 // 카드: 날짜·전통미 표시 + 짧은 제목(short) + 주요 기업 2곳. 위클리는 남색 카드.
 /* 지난 호: 주 단위로 묶는다.
-   위클리가 있는 주는 그 위클리의 기간(from~to)으로, 아직 위클리가 없는 최근 주는 월~일로 묶는다. */
+   위클리가 있는 주는 그 위클리의 기간(from~to)으로, 아직 위클리가 없는 최근 주는 금~목으로 묶는다.
+   (위클리는 2026-11-20부터 금요일 발행. 그 전 위클리는 월~일 기간이라 위클리 기간을 그대로 따른다.) */
 // 날짜 계산은 현지 날짜로만 한다(toISOString은 UTC로 바꿔서 한국 시간에서 하루가 밀린다)
 const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const addDays = (s, n) => { const d = new Date(s + "T00:00:00"); d.setDate(d.getDate() + n); return ymd(d); };
-const mondayOf = s => { const d = new Date(s + "T00:00:00"); return addDays(s, -((d.getDay() + 6) % 7)); };
+const fridayOf = s => { const d = new Date(s + "T00:00:00"); return addDays(s, -((d.getDay() + 2) % 7)); }; // 그 날이 속한 금~목 주의 금요일
+const nextFriday = () => { const t = ymd(new Date()), d = new Date(t + "T00:00:00"); return addDays(t, (5 - d.getDay() + 7) % 7); };
 function weekGroups() {
   const groups = WEEKLY.map(w => ({ weekly: w, from: w.from, to: w.to, issues: INDEX.filter(e => e.date >= w.from && e.date <= w.to) }));
   INDEX.filter(e => !groups.some(g => e.date >= g.from && e.date <= g.to)).forEach(e => {
-    const from = mondayOf(e.date), to = addDays(from, 6);
+    const from = fridayOf(e.date), to = addDays(from, 6);
     let g = groups.find(x => !x.weekly && x.from === from);
-    if (!g) groups.push(g = { weekly: null, from, to, next: addDays(from, 7), issues: [] });
+    if (!g) groups.push(g = { weekly: null, from, to, next: [addDays(from, 7), nextFriday()].sort()[1], issues: [] });
     g.issues.push(e);
   });
   groups.forEach(g => g.issues.sort((a, b) => a.date < b.date ? 1 : -1));
@@ -568,7 +673,14 @@ const weeklyArch = (w, current) => `
       ${w.short ? `<span class="sub">${esc(w.headline)}</span>` : ""}
     </a></li>`;
 
-// 메인 하단: 최신 위클리 + 가장 최근 주의 매일 호만. 그 전은 '전체 지난 호' 페이지로.
+const analysisArch = (f, current) => `
+    <li><a class="card arch analysis" href="?a=${esc(f.id)}"${"a=" + f.id === current ? ' aria-current="page"' : ""}>
+      <span class="top"><span class="d">분석회 ${esc(f.vol)}</span><span class="d dim">${md(f.id)}</span></span>
+      <span class="h">${seg(f.short)}</span>
+      <span class="sub">${esc(f.kind)} · ${esc(f.work)}</span>
+    </a></li>`;
+
+// 메인 하단: 최신 위클리 + 최신 월요 분석회 + 가장 최근 주의 매일 호만. 그 전은 '전체 지난 호' 페이지로.
 function renderArchive(current) {
   const g = weekGroups()[0];
   const latestW = WEEKLY[0];
@@ -577,6 +689,7 @@ function renderArchive(current) {
   document.getElementById("archive-filters").innerHTML = "";
   document.getElementById("archive-list").innerHTML =
     (latestW ? weeklyArch(latestW, current) : "") +
+    (ANALYSIS[0] ? analysisArch(ANALYSIS[0], current) : "") +
     recent.map(e => archCard(e, current)).join("") +
     `<li><a class="card arch all" href="?archive">
       <span class="top"><span class="d">ARCHIVE</span></span>
@@ -665,11 +778,16 @@ function renderArchivePage() {
             <b>${esc(g.weekly.short || g.weekly.headline)}</b>
             <span class="ar-go">위클리 읽기 →</span>
           </a>` : `<div class="ar-wk pending">
-            <span class="label">이번 주</span>
-            <span class="ar-span num">${md(g.from)} – ${md(g.to)}</span>
-            <b>위클리는 ${md(g.next)}(월) 아침에 나옵니다</b>
+            <span class="label">위클리 대기</span>
+            <span class="ar-span num">${md(g.issues[g.issues.length - 1].date)} – ${md(g.issues[0].date)}</span>
+            <b>위클리는 ${md(g.next)}(금) 아침에 나옵니다</b>
           </div>`}
-        <ul class="ar-rows">${g.issues.map(row).join("")}</ul>
+        <ul class="ar-rows">${ANALYSIS.filter(f => f.id >= g.from && f.id <= g.to).map(f => `
+        <li><a class="ar-row ar-an" href="?a=${esc(f.id)}">
+          <span class="ar-d num">${md(f.id)}<small>(월)</small></span>
+          <span class="ar-t"><b>콘텐츠 분석회 · ${esc(f.short)}</b><span class="ar-h">${esc(f.kind)} · ${esc(f.work)}</span></span>
+          <span class="ar-co"></span>
+        </a></li>`).join("")}${g.issues.map(row).join("")}</ul>
       </div>`;
   return `
   <div class="edition map-edition ar-edition">
@@ -703,13 +821,17 @@ function watchToc() {
 async function main() {
   const app = document.getElementById("app");
   try {
-    const [index, gloss, market, weekly] = await Promise.all([
+    const [index, gloss, market, weekly, analysis] = await Promise.all([
       getJSON("data/index.json"), getJSON("data/glossary.json").catch(() => ({})), getJSON("data/market.json").catch(() => null),
-      getJSON("data/weekly/index.json").catch(() => ({}))
+      getJSON("data/weekly/index.json").catch(() => ({})), getJSON("data/analysis/index.json").catch(() => ({}))
     ]);
     GLOSS = gloss; INDEX = index.issues || []; WEEKLY = weekly.weeklies || [];
+    // 분석회는 주말에 미리 올려 두고 그 월요일(현지 날짜)부터 목록에 보인다. 주소(?a=날짜)로는 미리 볼 수 있다.
+    ANALYSIS_ALL = analysis.items || []; ANALYSIS = ANALYSIS_ALL.filter(f => f.id <= today());
     const nav = document.getElementById("nav-weekly");
     if (nav && WEEKLY.length) nav.hidden = false;
+    const anav = document.getElementById("nav-analysis");
+    if (anav && ANALYSIS.length) anav.hidden = false;
     CW = Math.round(Math.max(320, Math.min(640, app.clientWidth)));
     const q = new URLSearchParams(location.search);
     if (q.has("archive")) {
@@ -739,6 +861,20 @@ async function main() {
       renderArchive(CURRENT);
       watchToc();
       document.getElementById("nav-weekly")?.setAttribute("aria-current", "page");
+      if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
+      return;
+    }
+    if (q.has("a") && (ANALYSIS.length || ANALYSIS_ALL.some(x => x.id === q.get("a")))) {
+      document.querySelectorAll('.chipnav a[href^="#"]').forEach(a => { if (a.getAttribute("href") !== "#archive") a.href = "./" + a.getAttribute("href"); });
+      const fp = ANALYSIS_ALL.find(x => x.id === q.get("a")) || ANALYSIS[0];
+      const fd = await getJSON(`data/analysis/${fp.id}.json`);
+      const list = ANALYSIS.includes(fp) ? ANALYSIS : [fp].concat(ANALYSIS);
+      const fi = list.indexOf(fp); // 최신순
+      CURRENT = "a=" + fp.id;
+      app.innerHTML = renderAnalysis(fd, list[fi + 1], fi > 0 && ANALYSIS.includes(list[fi - 1]) ? list[fi - 1] : null);
+      renderArchive(CURRENT);
+      watchToc();
+      document.getElementById("nav-analysis")?.setAttribute("aria-current", "page");
       if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
       return;
     }
