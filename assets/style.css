@@ -941,3 +941,72 @@ section > .f-box{margin-top:22px}
   .f-tab{padding:8px 4px;font-size:13px;line-height:1.25;white-space:normal;text-align:center}
   .f-tab .n{display:none}
 }
+
+/* =========================================================
+   타일 문법(네오브루탈리즘 요소) — 2026-11-16 적용
+   색 기준(하나로 통일): 전 = 흰색, 통 = 진파랑 #2b5c95, 미 = 하늘 #4b9cd6, 테두리·그림자 = 잉크
+   규칙: 모든 카드에 잉크 테두리 + 딱딱한 그림자. 누르는 것만 마우스를 올리면 들린다.
+   ========================================================= */
+:root{--hb-ink:#1c2733;--hb-w:1.5px;--t-jeon:#ffffff;--t-tong:#2b5c95;--t-mi:#4b9cd6;--t-jeon-fg:#1c2733;--t-mi-fg:#0e131a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--hb-ink:#c9d4e0;--t-jeon:#f4f7fb}}
+:root[data-theme="dark"]{--hb-ink:#c9d4e0;--t-jeon:#f4f7fb}
+
+/* ---- 헤더 로고: 점 아이콘을 빼고 글자 타일 세 장 ---- */
+.brand .mark{display:none}
+.nb-logo{display:inline-flex;align-items:center;font-size:0;line-height:1;padding:2px 9px 5px 2px}
+.nb-logo b{display:inline-grid;place-items:center;width:31px;height:31px;font-size:18px;font-weight:800;letter-spacing:-.04em;
+  border:2px solid var(--hb-ink);border-radius:6px;box-shadow:2.5px 2.5px 0 var(--hb-ink);position:relative;transition:transform .18s ease}
+.nb-logo b + b{margin-left:8px}
+.nb-logo b:nth-child(1){background:var(--t-jeon);color:var(--t-jeon-fg);transform:rotate(-5deg);z-index:3}
+.nb-logo b:nth-child(2){background:var(--t-tong);color:#fff;transform:translateY(2px) rotate(3deg);z-index:2}
+.nb-logo b:nth-child(3){background:var(--t-mi);color:var(--t-mi-fg);transform:rotate(-2deg);z-index:1}
+.nb-logo b::after{content:"";position:absolute;right:-7px;bottom:-1px;width:5px;height:5px;border-radius:1.5px;background:var(--hb-ink)}
+@media (hover:hover){.brand:hover .nb-logo b{transform:none}}
+@media (max-width:560px){.nb-logo b{width:28px;height:28px;font-size:16px}}
+
+/* ---- 전·통·미 표시(기사마다): 동그라미 → 작은 타일, 켜지면 각자 색 ---- */
+.axis b{border-radius:5px;border:1.5px solid var(--line)}
+.axis b.on{border-color:var(--hb-ink);box-shadow:1.5px 1.5px 0 var(--hb-ink)}
+.axis b.on:nth-child(1){background:var(--t-jeon);color:var(--t-jeon-fg)}
+.axis b.on:nth-child(2){background:var(--t-tong);color:#fff}
+.axis b.on:nth-child(3){background:var(--t-mi);color:var(--t-mi-fg)}
+
+/* ---- 칩 메뉴: 타일 버튼(누르는 것) ---- */
+.chipnav{gap:8px;padding-bottom:10px}
+.chipnav .ic{border-radius:12px;border:var(--hb-w) solid var(--hb-ink);box-shadow:3px 3px 0 var(--hb-ink);background:var(--card)}
+.chipnav a{font-weight:600}
+@media (hover:hover){.chipnav a:hover .ic{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--hb-ink);background:var(--t-tong);color:#fff}}
+.chipnav a[aria-current="page"] .ic,#nav-map[aria-current="page"] .ic{background:var(--hb-ink);color:var(--bg)}
+
+/* ---- 날짜 줄: 잉크 알약 ---- */
+.kicker{display:inline-block;background:var(--hb-ink);color:var(--bg) !important;padding:3px 10px;border-radius:6px}
+
+/* ---- 섹션 제목: 앞 단어를 흰 타일 스티커로(로고 '전' 타일과 같은 문법) ---- */
+.section-head h2 b,.archive-head h2 b{display:inline-block;background:var(--card);color:var(--fg);padding:0 9px;margin-right:4px;
+  border:var(--hb-w) solid var(--hb-ink);border-radius:6px;box-shadow:3px 3px 0 var(--hb-ink);transform:rotate(-1.2deg)}
+
+/* ---- 누르는 카드만 튀어나오게 ---- */
+.archive li a.arch,.weekly-card,.an-card,.wnum,.ar-wk:not(.pending),.m-co:not(.ghost){
+  border:var(--hb-w) solid var(--hb-ink) !important;box-shadow:4px 4px 0 var(--hb-ink) !important}
+.an-card{border-left-width:var(--hb-w) !important}
+.m-co:not(.ghost){box-shadow:2px 2px 0 var(--hb-ink) !important}
+@media (hover:hover){
+  .archive li a.arch:hover,.weekly-card:hover,.an-card:hover,.wnum:hover,.ar-wk:not(.pending):hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--hb-ink) !important;border-color:var(--hb-ink) !important}
+  .m-co:not(.ghost):hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--hb-ink) !important}
+}
+.archive li a.arch,.weekly-card,.an-card,.wnum,.ar-wk,.m-co{transition:transform .15s,box-shadow .15s}
+.share,.ar-btn{border:var(--hb-w) solid var(--hb-ink) !important;box-shadow:2px 2px 0 var(--hb-ink) !important}
+.share:hover,.ar-btn:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--hb-ink) !important}
+.ar-btn:disabled{box-shadow:none !important}
+.qz-opt{border:var(--hb-w) solid var(--hb-ink) !important;border-radius:10px !important;box-shadow:2px 2px 0 var(--hb-ink)}
+.qz-opt:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--hb-ink)}
+.qz-opt:disabled{box-shadow:none}
+
+@media (prefers-reduced-motion:reduce){
+  .nb-logo b,.chipnav .ic,.archive li a.arch,.weekly-card,.an-card,.wnum,.ar-wk,.m-co,.share,.ar-btn,.qz-opt{transition:none}
+}
+
+/* ---- 읽는 카드도 테두리 + 딱딱한 그림자(움직이지는 않음) ---- */
+.card,.card-art,.fig,.rcard,.qz,.mv-card,.f-question,.f-table,.m-card{
+  border:var(--hb-w) solid var(--hb-ink) !important;box-shadow:4px 4px 0 var(--hb-ink) !important}
+@media (max-width:560px){.card,.card-art,.fig,.rcard,.qz,.mv-card,.f-question,.f-table,.m-card,.archive li a.arch,.weekly-card,.an-card,.wnum{box-shadow:3px 3px 0 var(--hb-ink) !important}}
