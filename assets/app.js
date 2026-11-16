@@ -498,9 +498,14 @@ function renderAnalysis(f, older, newer) {
         ${f.tests.map((t, i) => `
         <article class="f-test card-art" id="ft${i}">
           <div class="f-test-head"><span class="label">${f.tests.length > 1 ? `층 ${i + 1}` : "검증"}</span><h3>${esc(t.title)}</h3><span class="st st-${VERDICT_CLS[t.verdict] || "none"}">${esc(t.verdict)}</span></div>
-          <div class="f-cols">
-            <div class="f-pro"><h4>${esc(t.proLabel || "지지하는 사실")}</h4><ul>${t.pro.map(x => `<li>${rich(x)}</li>`).join("")}</ul></div>
-            <div class="f-con"><h4>${esc(t.conLabel || "반대하는 사실")}</h4><ul>${t.con.map(x => `<li>${rich(x)}</li>`).join("")}</ul></div>
+          <div class="f-sides">
+            <div class="f-seg" role="tablist" aria-label="사실 보기">
+              <span class="f-pill" aria-hidden="true"></span>
+              <button type="button" role="tab" class="f-tab" id="ft${i}-pro-t" aria-controls="ft${i}-pro" aria-selected="true" data-side="pro">${esc(t.proLabel || "지지하는 사실")}<span class="n">${t.pro.length}</span></button>
+              <button type="button" role="tab" class="f-tab" id="ft${i}-con-t" aria-controls="ft${i}-con" aria-selected="false" tabindex="-1" data-side="con">${esc(t.conLabel || "반대하는 사실")}<span class="n">${t.con.length}</span></button>
+            </div>
+            <div class="f-pane f-pro" role="tabpanel" id="ft${i}-pro" aria-labelledby="ft${i}-pro-t"><ul>${t.pro.map((x, k) => `<li style="--i:${k}">${rich(x)}</li>`).join("")}</ul></div>
+            <div class="f-pane f-con" role="tabpanel" id="ft${i}-con" aria-labelledby="ft${i}-con-t" hidden><ul>${t.con.map((x, k) => `<li style="--i:${k}">${rich(x)}</li>`).join("")}</ul></div>
           </div>
           <div class="f-judge"><h4>판정</h4><p>${rich(t.judge)}</p></div>
         </article>`).join("")}
@@ -939,8 +944,29 @@ function toggleTheme() {
 darkQuery.addEventListener("change", syncThemeButton);
 syncThemeButton();
 
+// 분석회 검증 카드: 지지 / 반대 토글. 패널을 다시 보이면 CSS 애니메이션이 처음부터 재생된다.
+function pickSide(tab, focus) {
+  const box = tab.closest(".f-sides");
+  box.dataset.side = tab.dataset.side;
+  box.querySelectorAll(".f-tab").forEach(b => {
+    const on = b === tab;
+    b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1;
+    document.getElementById(b.getAttribute("aria-controls")).hidden = !on;
+  });
+  if (focus) tab.focus();
+}
+document.addEventListener("keydown", e => {
+  const t = e.target.closest && e.target.closest(".f-tab");
+  if (!t || !["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+  const tabs = [...t.parentElement.querySelectorAll(".f-tab")];
+  const k = e.key === "Home" ? 0 : e.key === "End" ? tabs.length - 1 : (tabs.indexOf(t) + (e.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+  e.preventDefault(); pickSide(tabs[k], true);
+});
+
 document.addEventListener("click", e => {
   if (e.target.closest("#theme-toggle")) { toggleTheme(); return; }
+  const ft = e.target.closest(".f-tab");
+  if (ft) { if (ft.getAttribute("aria-selected") !== "true") pickSide(ft); return; }
   const sb = e.target.closest("[data-share]");
   if (sb) { share(sb); return; }
   const mc = e.target.closest("[data-c]");

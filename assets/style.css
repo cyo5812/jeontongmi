@@ -825,3 +825,26 @@ section > .f-box{margin-top:22px}
 .f-verdict,.f-note{transition:box-shadow .25s}
 @media (hover:hover){.f-verdict:hover,.f-note:hover{box-shadow:var(--shadow-hi)}}
 @media (max-width:560px){.an-sum{padding:18px}.an-sum li{font-size:15px}}
+
+/* 검증 카드 토글: 알약이 미끄러지고, 고른 쪽 사실이 위에서부터 차례로 내려온다 */
+.f-sides{margin-top:16px}
+.f-seg{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
+.f-pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--accent);box-shadow:var(--shadow);transition:transform .35s cubic-bezier(.2,.8,.2,1),background-color .35s}
+.f-sides[data-side="con"] .f-pill{transform:translateX(100%);background:var(--kr)}
+.f-tab{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;border:0;border-radius:999px;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--sub);cursor:pointer;white-space:nowrap;transition:color .3s}
+.f-tab[aria-selected="true"]{color:#fff}
+.f-tab .n{min-width:20px;padding:0 6px;border-radius:999px;font-family:var(--mono);font-size:12px;line-height:18px;background:color-mix(in srgb,currentColor 16%,transparent)}
+.f-tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.f-pane{margin-top:12px;padding:16px 18px;border-radius:12px;animation:f-pane .35s ease both}
+.f-pane ul{margin:0;padding-left:18px;font-size:15px;line-height:1.65}
+.f-pane li{animation:f-drop .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 90ms + 80ms)}
+.f-pane li + li{margin-top:8px}
+.f-pane li::marker{color:var(--accent)}
+.f-con li::marker{color:var(--kr)}
+@keyframes f-pane{from{opacity:0;transform:scaleY(.96)}to{opacity:1;transform:none}}
+@keyframes f-drop{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+@media (hover:hover){.f-tab[aria-selected="false"]:hover{color:var(--fg)}}
+@media (max-width:560px){.f-seg{display:grid;width:100%}.f-tab{padding:8px 10px;font-size:13.5px}}
+@media (prefers-reduced-motion:reduce){.f-pill,.f-pane,.f-pane li{transition:none;animation:none}}
+:root[data-theme="dark"] .f-tab[aria-selected="true"]{color:var(--bg)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .f-tab[aria-selected="true"]{color:var(--bg)}}
