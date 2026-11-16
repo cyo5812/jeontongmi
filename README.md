@@ -50,3 +50,7 @@ scripts/validate_analysis.py  분석회 검증 + analysis/index.json 재생성
 python3 -m http.server 8000
 # http://localhost:8000
 ```
+
+## 디자인 파일을 고칠 때
+
+`assets/style.css`나 `assets/app.js`를 고치면 `index.html`의 `?v=` 값도 함께 바꾼다. 바꾸지 않으면 배포 뒤에도 방문자 브라우저가 최대 10분가량 옛 파일을 쓴다.
