@@ -890,3 +890,54 @@ section > .f-box{margin-top:22px}
   .pchat .pc-bub{padding:11px 14px}
 }
 @media (prefers-reduced-motion:reduce){.pchat.armed li{opacity:1}.pchat.armed.seen li{animation:none}}
+
+/* ===== 월요 콘텐츠 분석회: 별판 색(따뜻한 노랑 #ffe285). 노랑은 면(알약·카드·아이콘)에만, 글자는 짙은 호박색으로 대비 확보 ===== */
+:root{--an-hl:#ffe285;--an-ink:#7a5300;--an-line:#e2b23a;--an-on:#3d2c00}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--an-ink:#ffd866;--an-line:#b38d1f}}
+:root[data-theme="dark"]{--an-ink:#ffd866;--an-line:#b38d1f}
+
+/* 분석회 페이지 전체 토큰 */
+:root.an-page{--bg:#f8f4e8;--line:#ebe2cc;--soft:#f6efdc;--tile:#fbf6e7;--accent:#7a5300;--sky:#e2b23a;--accent-soft:#fff1c2;--accent-3:#f0d68a;
+  --kr:#7a5300;--kr-soft:#fff1c2;--con:#b4532a;--ink:#2b2418;--ink-fg:#f7f1e3;--ink-lb:#ffe285}
+@media (prefers-color-scheme: dark){:root.an-page:not([data-theme="light"]){--bg:#13110c;--card:#1c1912;--line:#322c1f;--soft:#262118;--tile:#241f16;
+  --accent:#ffd866;--sky:#c9a227;--accent-soft:#2f2914;--accent-3:#5a4a1c;--kr:#ffd866;--kr-soft:#2f2914;--con:#ee937c;--ink:#3a3222;--ink-fg:#f7f1e3;--ink-lb:#ffe285}}
+:root.an-page[data-theme="dark"]{--bg:#13110c;--card:#1c1912;--line:#322c1f;--soft:#262118;--tile:#241f16;
+  --accent:#ffd866;--sky:#c9a227;--accent-soft:#2f2914;--accent-3:#5a4a1c;--kr:#ffd866;--kr-soft:#2f2914;--con:#ee937c;--ink:#3a3222;--ink-fg:#f7f1e3;--ink-lb:#ffe285}
+.an-page .f-con h4,.an-page .f-con li::marker{color:var(--con)}
+.an-page .f-question,.an-page .f-note{border-left-color:var(--an-line)}
+
+/* 검증 카드 토글: 지지 · 반대 · 판정 세 칸 */
+.f-seg{grid-template-columns:repeat(3,auto)}
+.f-pill{width:calc((100% - 8px) / 3)}
+.f-sides[data-side="con"] .f-pill{transform:translateX(100%);background:var(--con,var(--kr))}
+.f-sides[data-side="judge"] .f-pill{transform:translateX(200%);background:var(--ink)}
+.f-seg{grid-template-columns:repeat(3,1fr)}
+.an-page .f-sides:not([data-side]) .f-pill,.an-page .f-sides[data-side="pro"] .f-pill{background:var(--an-hl)}
+.an-page .f-tab[data-side="pro"][aria-selected="true"]{color:var(--an-on)}
+.an-page .f-tab[data-side="con"][aria-selected="true"],.an-page .f-tab[data-side="judge"][aria-selected="true"]{color:#fff}
+.f-pane.f-judge{margin-top:12px;padding:18px 20px}
+.f-pane.f-judge h4{color:var(--ink-lb)}
+
+/* 상단 분석회 버튼·월요일 호 링크 카드: 노랑으로 통일 */
+.chipnav a.nav-an,.chipnav a.nav-an:hover,.chipnav a.nav-an[aria-current="page"]{color:var(--an-ink)}
+.chipnav a.nav-an .ic{background:var(--an-hl);color:var(--an-on);box-shadow:0 0 0 4px color-mix(in srgb,var(--an-hl) 35%,transparent),var(--shadow)}
+.chipnav a.nav-an .ic::after{background:#d9653b}
+.chipnav a.nav-an[aria-current="page"] .ic{background:var(--an-hl);color:var(--an-on);box-shadow:0 0 0 3px var(--an-line),var(--shadow)}
+.an-card{border-left-color:var(--an-line)}
+.an-card .label,.an-card .wc-go{color:var(--an-ink)}
+
+/* 지난 호 진열대: 분석회 카드는 노랑 면 + 호박색 테두리 */
+.archive li a.arch.analysis{background:var(--an-hl);color:var(--an-on);border:1px solid var(--an-line)}
+.archive li a.arch.analysis .d{color:#7a5300}
+.archive li a.arch.analysis .sub,.archive li a.arch.analysis .h{color:var(--an-on)}
+.archive li a.arch.analysis[aria-current="page"]{outline:2px solid #b8860b;outline-offset:-2px}
+:root.an-page .archive li a.arch[aria-current="page"]:not(.analysis){outline-color:var(--an-line)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .archive li a.arch.analysis{background:#2f2810;color:#ffe9a8}
+  :root:not([data-theme="light"]) .archive li a.arch.analysis .d,:root:not([data-theme="light"]) .archive li a.arch.analysis .h,:root:not([data-theme="light"]) .archive li a.arch.analysis .sub{color:#ffe285}}
+:root[data-theme="dark"] .archive li a.arch.analysis{background:#2f2810;color:#ffe9a8}
+:root[data-theme="dark"] .archive li a.arch.analysis .d,:root[data-theme="dark"] .archive li a.arch.analysis .h,:root[data-theme="dark"] .archive li a.arch.analysis .sub{color:#ffe285}
+@media (max-width:560px){
+  .f-seg{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .f-tab{padding:8px 4px;font-size:13px;line-height:1.25;white-space:normal;text-align:center}
+  .f-tab .n{display:none}
+}

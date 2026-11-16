@@ -503,11 +503,12 @@ function renderAnalysis(f, older, newer) {
               <span class="f-pill" aria-hidden="true"></span>
               <button type="button" role="tab" class="f-tab" id="ft${i}-pro-t" aria-controls="ft${i}-pro" aria-selected="true" data-side="pro">${esc(t.proLabel || "지지하는 사실")}<span class="n">${t.pro.length}</span></button>
               <button type="button" role="tab" class="f-tab" id="ft${i}-con-t" aria-controls="ft${i}-con" aria-selected="false" tabindex="-1" data-side="con">${esc(t.conLabel || "반대하는 사실")}<span class="n">${t.con.length}</span></button>
+              <button type="button" role="tab" class="f-tab" id="ft${i}-judge-t" aria-controls="ft${i}-judge" aria-selected="false" tabindex="-1" data-side="judge">판정</button>
             </div>
             <div class="f-pane f-pro" role="tabpanel" id="ft${i}-pro" aria-labelledby="ft${i}-pro-t"><ul>${t.pro.map((x, k) => `<li style="--i:${k}">${rich(x)}</li>`).join("")}</ul></div>
             <div class="f-pane f-con" role="tabpanel" id="ft${i}-con" aria-labelledby="ft${i}-con-t" hidden><ul>${t.con.map((x, k) => `<li style="--i:${k}">${rich(x)}</li>`).join("")}</ul></div>
+            <div class="f-pane f-judge" role="tabpanel" id="ft${i}-judge" aria-labelledby="ft${i}-judge-t" hidden><h4>판정 · ${esc(t.verdict)}</h4><p>${rich(t.judge)}</p></div>
           </div>
-          <div class="f-judge"><h4>판정</h4><p>${rich(t.judge)}</p></div>
         </article>`).join("")}
         <div class="f-verdict card"><span class="label">종합 판정</span><p>${lines(f.conclusion)}</p></div>
       </section>
@@ -924,6 +925,7 @@ async function main() {
       const list = ANALYSIS.includes(fp) ? ANALYSIS : [fp].concat(ANALYSIS);
       const fi = list.indexOf(fp); // 최신순
       CURRENT = "a=" + fp.id;
+      document.documentElement.classList.add("an-page");
       app.innerHTML = renderAnalysis(fd, list[fi + 1], fi > 0 && ANALYSIS.includes(list[fi - 1]) ? list[fi - 1] : null);
       renderArchive(CURRENT);
       watchToc(); watchChat();
