@@ -469,25 +469,28 @@ function renderAnalysis(f, older, newer) {
     </nav>
   </div>
 
-  <section class="brief60 card" aria-label="이번 주 3줄">
+  <section class="brief60 card an-sum" aria-label="이번 주 3줄">
     <div class="label">이번 주 3줄</div>
     <ol>${f.summary.map(t => `<li><span>${sent(t)}</span></li>`).join("")}</ol>
-    ${f.lens ? `<p class="lens"><b>이번 주의 판정</b>${sent(f.lens)}</p>` : ""}
   </section>
 
   <div class="layout">
     <div class="colmain">
       <section id="fq">
         ${head("이번 주의 질문", "편집장이 던진 앵글")}
+        <div class="card-art f-box">
         <blockquote class="f-question"><p>${lines(f.question)}</p><cite>편집장 ${esc(f.note.by)}</cite></blockquote>
         ${f.layers && f.layers.length ? `<p class="f-intro">${lines("이 질문을 검증하기 위해 '고착화된 흥행 흐름'을 세 층으로 나눠 봤다.")}</p>
         <ol class="f-layers">${f.layers.map(([a, b]) => `<li><b>${esc(a)}</b><span>${esc(b)}</span></li>`).join("")}</ol>` : ""}
+        </div>
       </section>
 
       ${f.timeline && f.timeline.length ? `<section id="ftime">
         ${head("한눈에 보기", "무슨 일이 어떤 순서로 일어났나")}
+        <div class="card-art f-box">
         <ol class="f-timeline">${f.timeline.map(([d, t]) => `<li><span class="num">${esc(d)}</span><span>${esc(t)}</span></li>`).join("")}</ol>
         ${f.timelineNote ? `<p class="f-body">${lines(f.timelineNote)}</p>` : ""}
+        </div>
       </section>` : ""}
 
       <section id="ftest">
@@ -496,26 +499,30 @@ function renderAnalysis(f, older, newer) {
         <article class="f-test card-art" id="ft${i}">
           <div class="f-test-head"><span class="label">${f.tests.length > 1 ? `층 ${i + 1}` : "검증"}</span><h3>${esc(t.title)}</h3><span class="st st-${VERDICT_CLS[t.verdict] || "none"}">${esc(t.verdict)}</span></div>
           <div class="f-cols">
-            <div><h4>${esc(t.proLabel || "지지하는 사실")}</h4><ul>${t.pro.map(x => `<li>${rich(x)}</li>`).join("")}</ul></div>
-            <div><h4>${esc(t.conLabel || "반대하는 사실")}</h4><ul>${t.con.map(x => `<li>${rich(x)}</li>`).join("")}</ul></div>
+            <div class="f-pro"><h4>${esc(t.proLabel || "지지하는 사실")}</h4><ul>${t.pro.map(x => `<li>${rich(x)}</li>`).join("")}</ul></div>
+            <div class="f-con"><h4>${esc(t.conLabel || "반대하는 사실")}</h4><ul>${t.con.map(x => `<li>${rich(x)}</li>`).join("")}</ul></div>
           </div>
-          <p class="why"><b>판정</b>${rich(t.judge)}</p>
+          <div class="f-judge"><h4>판정</h4><p>${rich(t.judge)}</p></div>
         </article>`).join("")}
         <div class="f-verdict card"><span class="label">종합 판정</span><p>${lines(f.conclusion)}</p></div>
       </section>
 
       ${f.money ? `<section id="fmoney">
         ${head("돈은 어디로 가나", "권리와 수익의 흐름")}
+        <div class="card-art f-box">
         ${f.money.rows && f.money.rows.length ? `<div class="f-table"><table><thead><tr><th>권리·수익</th><th>누구에게</th><th>확인 수준</th></tr></thead><tbody>${f.money.rows.map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td><span class="st st-${c === "미확인" ? "none" : c === "보도로 확인" ? "ok" : "wait"}">${esc(c)}</span></td></tr>`).join("")}</tbody></table></div>` : ""}
         ${f.money.body ? `<p class="f-body">${lines(f.money.body)}</p>` : ""}
         ${f.money.compare ? `<p class="f-body">${lines(f.money.compare)}</p>` : ""}
         ${f.money.take ? `<p class="lens f-take"><b>우리 해석</b>${sent(f.money.take)}</p>` : ""}
+        </div>
       </section>` : ""}
 
       <section id="fplan">
         ${head("전략기획가라면", "각자의 자리에서 다음 수")}
+        <div class="card-art f-box">
         <div class="planner"><span class="label">내가 전략기획자라면</span><ol>${f.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${sent(b)}</span></li>`).join("")}</ol></div>
         ${f.questions && f.questions.length ? `<div class="f-questions"><h4>토론 질문</h4><ul>${f.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul></div>` : ""}
+        </div>
       </section>
 
       <section id="fnote">
@@ -523,8 +530,10 @@ function renderAnalysis(f, older, newer) {
         <div class="f-note card">${paras(f.note.text)}<p class="f-sign">— 편집장 ${esc(f.note.by)}</p></div>
       </section>
 
+      <div class="card-art f-box f-end">
       ${f.unknown && f.unknown.length ? `<section class="f-unknown"><h4>아직 확인하지 못한 것</h4><ul>${f.unknown.map(u => `<li>${esc(u)}</li>`).join("")}</ul><p>${lines("공개 자료로 확인되지 않은 것은 본문에서 단정하지 않았습니다. 확인되면 다음 회에서 바로잡습니다.")}</p></section>` : ""}
       <div class="foot f-src">${srcs(f.src)}</div>
+      </div>
     </div>
     <aside class="rail only-desk">
       <div class="gloss rcard"><h3>월요 콘텐츠 분석회는</h3><p>${lines("매주 월요일, 대중이 사랑한 작품 하나를 골라 산업과 전략기획의 눈으로 해부합니다. 편집장이 작품과 질문을 정하고, 지지하는 사실과 반대하는 사실을 나란히 놓고 검증합니다.")}</p></div>

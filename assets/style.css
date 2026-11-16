@@ -794,3 +794,34 @@ footer .foot-brand b{margin-right:6px}
 .chipnav a.nav-an[aria-current="page"]{color:var(--kr)}
 .chipnav a.nav-an[aria-current="page"] .ic{background:var(--kr);color:var(--card);box-shadow:0 0 0 4px var(--kr),var(--shadow)}
 .chipnav a.nav-an[aria-current="page"] .ic::after{display:none}
+
+/* 분석회 보완(11.16): 모든 글을 카드 안에, 3줄은 촘촘하게, 검증 카드는 지지·반대·판정 삼분할 */
+.an-sum{padding:20px 24px}
+.an-sum .label{margin-bottom:8px}
+.an-sum ol{gap:6px}
+.an-sum li{font-size:15.5px;line-height:1.6;font-weight:500}
+.an-sum li::before{font-size:14px;padding-top:1px}
+section > .f-box{margin-top:22px}
+.f-box .f-question{margin:0;padding:4px 0 4px 20px;border-radius:0;background:none;box-shadow:none}
+.f-box .f-intro{margin-top:18px}
+.f-box .f-layers li{background:var(--soft)}
+.f-box .f-timeline{margin:0 0 4px}
+.f-box .f-table{margin-top:0;padding:0;background:none;box-shadow:none;border-radius:0}
+.f-box .f-take{margin-top:16px}
+#fplan .f-box .planner{margin-top:0;background:var(--kr-soft)}
+.f-end .f-unknown{margin:0 0 18px;padding:0 0 16px;border:0;border-bottom:1px solid var(--line);border-radius:0}
+.f-end .f-src{margin-top:0;padding-top:0;border-top:0}
+.f-cols{gap:12px;margin:16px 0 0}
+.f-cols > div,.f-judge{padding:16px 18px;border-radius:12px}
+.f-cols h4,.f-judge h4{display:flex;align-items:center;gap:6px;margin:0 0 8px;font-size:13px;font-weight:700}
+.f-cols h4::before,.f-judge h4::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.f-pro{background:var(--accent-soft)}
+.f-pro h4{color:var(--accent)}
+.f-con{background:var(--kr-soft)}
+.f-con h4{color:var(--kr)}
+.f-judge{margin-top:12px;background:var(--soft);border:1px solid var(--line)}
+.f-judge h4{color:var(--fg)}
+.f-judge p{margin:0;font-size:15px;line-height:1.7;color:var(--fg)}
+.f-verdict,.f-note{transition:box-shadow .25s}
+@media (hover:hover){.f-verdict:hover,.f-note:hover{box-shadow:var(--shadow-hi)}}
+@media (max-width:560px){.an-sum{padding:18px}.an-sum li{font-size:15px}}
