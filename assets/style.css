@@ -808,7 +808,8 @@ section > .f-box{margin-top:22px}
 .f-box .f-timeline{margin:0 0 4px}
 .f-box .f-table{margin-top:0;padding:0;background:none;box-shadow:none;border-radius:0}
 .f-box .f-take{margin-top:16px}
-#fplan .f-box .planner{margin-top:0;background:var(--kr-soft)}
+#fplan .f-box .planner{margin-top:0;background:var(--accent-soft);border-left-color:var(--accent)}
+#fplan .f-box .planner .label{color:var(--accent)}
 .f-end .f-unknown{margin:0 0 18px;padding:0 0 16px;border:0;border-bottom:1px solid var(--line);border-radius:0}
 .f-end .f-src{margin-top:0;padding-top:0;border-top:0}
 .f-cols{gap:12px;margin:16px 0 0}

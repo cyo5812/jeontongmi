@@ -49,7 +49,7 @@ tests[{title, verdict, pro[], con[], proLabel?, conLabel?, judge}],
 conclusion,
 money{rows[[권리·수익, 누구에게, 확인 수준]], body, compare, take}(선택),
 planner[[대상, 다음 수]], questions[](선택),
-note{by, text}(문단은 빈 줄로 나눈다), unknown[](선택), src[[이름, 주소]]
+note{by: "Mday"(편집장 표기는 항상 Mday), text}(문단은 빈 줄로 나눈다), unknown[](선택), src[[이름, 주소]]
 ```
 
 - `kind`: 드라마·영화·예능·음악·공연·게임·웹툰·애니메이션·책·유튜브·기타
