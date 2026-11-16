@@ -1010,3 +1010,32 @@ section > .f-box{margin-top:22px}
 .card,.card-art,.fig,.rcard,.qz,.mv-card,.f-question,.f-table,.m-card{
   border:var(--hb-w) solid var(--hb-ink) !important;box-shadow:4px 4px 0 var(--hb-ink) !important}
 @media (max-width:560px){.card,.card-art,.fig,.rcard,.qz,.mv-card,.f-question,.f-table,.m-card,.archive li a.arch,.weekly-card,.an-card,.wnum{box-shadow:3px 3px 0 var(--hb-ink) !important}}
+
+/* ---- 상단 바로 가기 버튼: 같은 간격 + 스크롤해도 고정 ---- */
+/* 간격: 버튼마다 같은 폭, 이름은 한 줄. 화면이 좁으면 한 줄을 똑같이 나눠 가진다 */
+.chipnav{gap:10px}
+.chipnav a{width:78px;white-space:nowrap}
+@media (max-width:560px){.chipnav{gap:0}.chipnav a{flex:1 1 0;width:auto;min-width:0}}
+/* 고정: 머리(로고 줄) 바로 아래에 붙는다 */
+html{scroll-padding-top:calc(var(--mast-h,58px) + 74px)}
+.chipnav{position:sticky;top:calc(var(--mast-h,58px) + env(safe-area-inset-top,0px));z-index:35}
+.chipnav::before{content:"";position:absolute;inset:0 calc(50% - 50vw);z-index:-1;background:transparent;transition:background .2s,border-color .2s;border-bottom:1px solid transparent}
+.chipnav.stuck{padding-top:8px;padding-bottom:8px}
+.chipnav.stuck::before{background:color-mix(in srgb,var(--bg) 88%,transparent);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);border-bottom-color:var(--line)}
+/* 붙었을 때: PC는 아이콘 옆에 이름(알약 버튼), 모바일은 작은 아이콘 + 작은 이름 */
+.chipnav.stuck a{flex-direction:row;width:auto;gap:7px;padding:3px 12px 3px 3px;border-radius:12px}
+.chipnav.stuck .ic{width:34px;height:34px;border-radius:9px;box-shadow:2px 2px 0 var(--hb-ink)}
+.chipnav.stuck .ic svg{width:17px;height:17px}
+.chipnav.stuck a.nav-an .ic::after{top:1px;right:1px;width:7px;height:7px}
+@media (max-width:560px){
+  .chipnav.stuck{padding-top:6px;padding-bottom:6px}
+  .chipnav.stuck a{flex-direction:column;flex:1 1 0;width:auto;gap:3px;padding:0;font-size:10.5px}
+  .chipnav.stuck .ic{width:30px;height:30px;border-radius:8px}
+  .chipnav.stuck .ic svg{width:16px;height:16px}
+}
+.chipnav-sentinel{height:1px;margin-bottom:-1px}
+@media (prefers-reduced-motion:reduce){.chipnav::before{transition:none}}
+
+/* 고정 메뉴 아래로 다른 고정 요소(목차·지도 카드·위클리 카드)를 내려서 겹치지 않게 */
+.rail .toc-card,.m-card,.ar-wk{top:calc(var(--mast-h,58px) + 72px + env(safe-area-inset-top,0px)) !important}
+@media (max-width:900px){.m-card{top:auto !important}}

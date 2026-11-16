@@ -459,7 +459,7 @@ function renderAnalysis(f, older, newer) {
   return `
   ${preview ? `<p class="issue-note f-preview"><span class="line">예약 발행 미리보기입니다.</span><span class="line">${kdate(f.id)} 월요일 아침에 공개됩니다.</span></p>` : ""}
   <div class="edition an-edition">
-    <p class="kicker num">월요 콘텐츠 분석회 · ${kdate(f.id)} · ${esc(f.vol)}호 · ${esc(f.kind)} · ${esc(f.readMin || 7)}분 읽기</p>
+    <p class="kicker num">월요 콘텐츠 분석회 · ${kdate(f.id)} · ${esc(f.vol)}호</p>
     <h1>${twoTone(f.headline)}</h1>
     <p class="f-work"><span class="label">이번 주 작품</span><b>${esc(f.work)}</b><span>${esc(f.maker)}${f.year ? ` · ${esc(f.year)}` : ""}</span></p>
     <nav class="meta" aria-label="분석회 이동">
@@ -1030,4 +1030,38 @@ document.addEventListener("pointermove", e => {
   tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + "px";
   tip.style.top = (e.clientY + 14) + "px";
 });
+/* 상단 바로 가기 버튼: 스크롤해도 머리 아래에 붙어 있게.
+   붙는 순간 작은 막대로 줄어들고, 줄어든 만큼 아래 빈칸(spacer)을 늘려서 본문이 튀지 않게 한다. */
+function stickyNav() {
+  const nav = document.querySelector(".chipnav"), sentinel = document.querySelector(".chipnav-sentinel"),
+        spacer = document.querySelector(".chipnav-spacer"), mast = document.querySelector(".mast");
+  if (!nav || !sentinel || !mast) return;
+  const root = document.documentElement;
+  const measure = () => {
+    root.style.setProperty("--mast-h", mast.offsetHeight + "px");
+    if (nav.classList.contains("stuck")) {
+      nav.classList.remove("stuck"); const full = nav.offsetHeight; nav.classList.add("stuck");
+      if (spacer) spacer.style.height = Math.max(0, full - nav.offsetHeight) + "px";
+    }
+  };
+  const set = on => {
+    if (on === nav.classList.contains("stuck")) return;
+    const full = on ? nav.offsetHeight : 0;
+    nav.classList.toggle("stuck", on);
+    if (spacer) spacer.style.height = on ? Math.max(0, full - nav.offsetHeight) + "px" : "0px";
+  };
+  measure();
+  window.addEventListener("resize", measure);
+  if (!("IntersectionObserver" in window)) return;
+  let io;
+  const watch = () => {
+    if (io) io.disconnect();
+    io = new IntersectionObserver(([e]) => set(!e.isIntersecting && e.boundingClientRect.top < mast.offsetHeight + 1),
+      { rootMargin: `-${mast.offsetHeight}px 0px 0px 0px`, threshold: 0 });
+    io.observe(sentinel);
+  };
+  watch();
+  window.addEventListener("resize", watch);
+}
+stickyNav();
 main();
