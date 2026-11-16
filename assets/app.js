@@ -255,7 +255,7 @@ function renderIssue(d, market, older, newer) {
         ${figure(L.figure, true)}
         <h4><span class="label">WHY</span>왜 중요한가</h4>
         <p>${rich(L.why)}</p>
-        ${L.planner && L.planner.length ? `<div class="planner"><span class="label">내가 전략기획자라면</span><ol>${L.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${rich(b)}</span></li>`).join("")}</ol></div>` : ""}
+        ${plannerChat(L.planner, rich)}
         <h4><span class="label">WATCH</span>지켜볼 것</h4>
         <p class="watch">${sent(L.watch)}</p>
         <div class="foot">${srcs(L.src)}${shareBtn("lead", L.title)}</div>
@@ -525,7 +525,7 @@ function renderAnalysis(f, older, newer) {
       <section id="fplan">
         ${head("전략기획가라면", "각자의 자리에서 다음 수")}
         <div class="card-art f-box">
-        <div class="planner"><span class="label">내가 전략기획자라면</span><ol>${f.planner.map(([a, b]) => `<li><b>${esc(a)}</b><span>${sent(b)}</span></li>`).join("")}</ol></div>
+        ${plannerChat(f.planner, sent)}
         ${f.questions && f.questions.length ? `<div class="f-questions"><h4>토론 질문</h4><ul>${f.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul></div>` : ""}
         </div>
       </section>
@@ -818,6 +818,45 @@ function renderArchivePage() {
 
 /* 따라오는 목차: 지금 화면에 걸친 기사를 표시한다 */
 let spy;
+/* ---------- 내가 전략기획자라면: 회의실 대화 ---------- */
+// 역할 이름으로 아이콘을 고른다. 데이터에 세 번째 칸([역할, 질문, 아이콘])이 있으면 그것을 쓴다.
+const ROLE_IC = {
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  scale: '<path d="M12 3v18M6 21h12M5 7h14M7 7l-3 7a3 3 0 0 0 6 0zM17 7l-3 7a3 3 0 0 0 6 0z"/>',
+  antenna: '<path d="M12 12v9M8 21h8M8.5 8.5a5 5 0 0 1 7 0M5.6 5.6a9 9 0 0 1 12.8 0"/><circle cx="12" cy="11" r="1.2"/>',
+  chip: '<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  play: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/>',
+  tv: '<rect x="3" y="7" width="18" height="12" rx="2"/><path d="m8 3 4 4 4-4"/>',
+  ad: '<path d="M3 10v4h3l6 4V6L6 10zM16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/>',
+  case: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>'
+};
+const ROLE_RULES = [
+  ["user", /가입자|시청자|이용자|고객|소비자|구독자|팬\b|마케팅/],
+  ["scale", /방미통위|방통위|규제|정부|공정위|과기정통부|FCC|FTC|당국|위원회|국회|정책/],
+  ["antenna", /통신|SKT|SK텔레콤|KT\b|LG유플러스|유플러스|5G|6G|네트워크|망/],
+  ["chip", /반도체|하이닉스|삼성전자|전자|제조|디바이스|단말|칩/],
+  ["mic", /기획사|아티스트|가수|레이블|음반|권리|베스티|그룹|밴드|하이브|SM|JYP|YG|작곡|제작/],
+  ["play", /플랫폼|OTT|넷플릭스|티빙|웨이브|쿠팡플레이|유튜브|스트리밍|음원|멜론|스포티파이|앱/],
+  ["tv", /방송|채널|케이블|IPTV|ENM|SO\b|헬로비전|홈쇼핑|PP/],
+  ["ad", /광고|마케터|커머스/]
+];
+const roleIcon = (name, force) => {
+  const k = ROLE_IC[force] ? force : (ROLE_RULES.find(([, re]) => re.test(name)) || ["case"])[0];
+  return `<span class="pc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ROLE_IC[k]}</svg></span>`;
+};
+const plannerChat = (rows, fmt) => !rows || !rows.length ? "" : `
+  <div class="planner pchat"><span class="label">내가 전략기획자라면</span>
+    <ol>${rows.map(([a, b, ic], i) => `<li style="--i:${i}">${roleIcon(a, ic)}<div class="pc-body"><b class="pc-who">${esc(a)}</b><div class="pc-bub">${fmt(b)}</div></div></li>`).join("")}</ol>
+  </div>`;
+// 화면에 들어오면 말풍선이 차례로 떠오른다
+function watchChat() {
+  const els = document.querySelectorAll(".pchat:not(.seen)");
+  if (!("IntersectionObserver" in window)) { els.forEach(e => e.classList.add("seen")); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("seen"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -15% 0px" });
+  els.forEach(e => { e.classList.add("armed"); io.observe(e); });
+}
+
 function watchToc() {
   spy?.disconnect();
   const links = [...document.querySelectorAll(".toc-card .toc a")];
@@ -873,7 +912,7 @@ async function main() {
       CURRENT = "w=" + wp.id;
       app.innerHTML = renderWeekly(wd, WEEKLY[wi + 1], WEEKLY[wi - 1], INDEX);
       renderArchive(CURRENT);
-      watchToc();
+      watchToc(); watchChat();
       document.getElementById("nav-weekly")?.setAttribute("aria-current", "page");
       if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
       return;
@@ -887,7 +926,7 @@ async function main() {
       CURRENT = "a=" + fp.id;
       app.innerHTML = renderAnalysis(fd, list[fi + 1], fi > 0 && ANALYSIS.includes(list[fi - 1]) ? list[fi - 1] : null);
       renderArchive(CURRENT);
-      watchToc();
+      watchToc(); watchChat();
       document.getElementById("nav-analysis")?.setAttribute("aria-current", "page");
       if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
       return;
@@ -900,7 +939,7 @@ async function main() {
     CURRENT = "d=" + pick.date;
     app.innerHTML = renderIssue(issue, pick === INDEX[0] ? market : null, INDEX[at + 1], INDEX[at - 1]);
     renderArchive(CURRENT);
-    watchToc();
+    watchToc(); watchChat();
     if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
   } catch (e) {
     app.innerHTML = `<p class="loading">브리프를 불러오지 못했습니다. 잠시 후 새로고침해 주세요. (${esc(e.message)})</p>`;

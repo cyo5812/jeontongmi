@@ -755,9 +755,6 @@ footer .foot-brand b{margin-right:6px}
 .f-table .st{margin-left:0}
 .f-take{background:var(--kr-soft)}
 
-#fplan .planner{margin-top:22px;border-color:transparent;border-left-color:var(--kr);background:var(--card)}
-#fplan .planner .label{color:var(--kr)}
-#fplan .planner li span{display:block}
 .f-questions{margin-top:18px}
 .f-questions h4{margin:0 0 6px;font-size:14px}
 .f-questions ul{margin:0;padding-left:20px;color:var(--sub);font-size:15px}
@@ -808,8 +805,6 @@ section > .f-box{margin-top:22px}
 .f-box .f-timeline{margin:0 0 4px}
 .f-box .f-table{margin-top:0;padding:0;background:none;box-shadow:none;border-radius:0}
 .f-box .f-take{margin-top:16px}
-#fplan .f-box .planner{margin-top:0;background:var(--accent-soft);border-left-color:var(--accent)}
-#fplan .f-box .planner .label{color:var(--accent)}
 .f-end .f-unknown{margin:0 0 18px;padding:0 0 16px;border:0;border-bottom:1px solid var(--line);border-radius:0}
 .f-end .f-src{margin-top:0;padding-top:0;border-top:0}
 .f-cols{gap:12px;margin:16px 0 0}
@@ -849,3 +844,49 @@ section > .f-box{margin-top:22px}
 @media (prefers-reduced-motion:reduce){.f-pill,.f-pane,.f-pane li{transition:none;animation:none}}
 :root[data-theme="dark"] .f-tab[aria-selected="true"]{color:var(--bg)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .f-tab[aria-selected="true"]{color:var(--bg)}}
+
+/* ===== D안(11.16): 카드 안 색 박스는 중성 회색 타일, 결론 한 칸만 잉크 반전. 색은 라벨에만 ===== */
+:root{--tile:#f5f6f8;--ink:#1c2733;--ink-fg:#eef2f6;--ink-lb:#9fc3ea}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--tile:#1f2834;--ink:#2a3a52;--ink-fg:#f1f5f9;--ink-lb:#a9cbef}}
+:root[data-theme="dark"]{--tile:#1f2834;--ink:#2a3a52;--ink-fg:#f1f5f9;--ink-lb:#a9cbef}
+
+/* 결론(오늘의 관점·이번 주의 관점·우리 해석·판정·종합 판정): 잉크 반전 */
+.lens,.an-edition ~ .brief60 .lens,.f-take,.f-judge,.f-verdict{background:var(--ink);color:var(--ink-fg);border:0;border-radius:12px}
+.lens,.f-take{padding:16px 20px}
+.lens b,.f-take b{display:block;margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--ink-lb)}
+.lens .line{color:var(--ink-fg)}
+.f-judge h4,.f-verdict .label{color:var(--ink-lb)}
+.f-judge p,.f-verdict p{color:var(--ink-fg)}
+.f-judge a,.lens a,.f-verdict a{color:var(--ink-fg)}
+
+/* 나머지 박스: 중성 회색 타일, 라벨 글자만 색 */
+.krline,.f-pro,.f-con{background:var(--tile)}
+.krline b{color:var(--kr)}
+.f-box .f-layers li{background:var(--tile)}
+
+/* 내가 전략기획자라면: 회의실 대화 */
+.planner.pchat{margin-top:24px;padding:0;border:0;border-radius:0;background:none}
+.pchat > .label{display:block;margin:0 0 14px;color:var(--accent)}
+.planner.pchat ol{display:grid;gap:14px;margin:0;padding:0;list-style:none}
+.planner.pchat li{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start;padding:0;border:0}
+.planner.pchat li:nth-child(even){grid-template-columns:minmax(0,1fr) 40px}
+.planner.pchat li:nth-child(even) .pc-ic{order:2}
+.planner.pchat li:nth-child(even) .pc-who{text-align:right}
+.planner.pchat li:nth-child(even) .pc-bub{border-radius:16px 4px 16px 16px}
+.pchat .pc-ic{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--ink);color:var(--ink-fg)}
+.pchat .pc-ic svg{width:20px;height:20px}
+.pchat .pc-who{display:block;margin:1px 4px 5px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.pchat .pc-bub{padding:12px 16px;border:1px solid var(--line);border-radius:4px 16px 16px 16px;background:var(--tile);font-size:15px;line-height:1.65;color:var(--fg)}
+.pchat .pc-bub span{color:inherit;font-size:inherit}
+.pchat.armed li{opacity:0}
+.pchat.armed.seen li{animation:pc-in .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 220ms)}
+@keyframes pc-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+@media (max-width:560px){
+  .planner.pchat li,.planner.pchat li:nth-child(even){grid-template-columns:34px minmax(0,1fr);gap:10px}
+  .planner.pchat li:nth-child(even) .pc-ic{order:0}
+  .planner.pchat li:nth-child(even) .pc-who{text-align:left}
+  .planner.pchat li:nth-child(even) .pc-bub{border-radius:4px 16px 16px 16px}
+  .pchat .pc-ic{width:34px;height:34px}.pchat .pc-ic svg{width:18px;height:18px}
+  .pchat .pc-bub{padding:11px 14px}
+}
+@media (prefers-reduced-motion:reduce){.pchat.armed li{opacity:1}.pchat.armed.seen li{animation:none}}
