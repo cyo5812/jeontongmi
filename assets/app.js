@@ -855,8 +855,8 @@ const REVEAL = ".pchat, .fig, .brief60, .timeline, .wnums, .quiz, .shelf";
 function watchChat() {
   const els = [...document.querySelectorAll(REVEAL)].filter(e => !e.classList.contains("armed"));
   if (!els.length) return;
-  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (reduce || !("IntersectionObserver" in window)) return;
+  // 동작 줄이기 환경도 막지 않는다: CSS가 이동 없이 페이드만 보여 준다
+  if (!("IntersectionObserver" in window)) return;
   // 차트 안 요소마다 순번을 붙여 차례로 그려지게 한다
   els.forEach(e => {
     if (e.classList.contains("fig")) {

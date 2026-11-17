@@ -1080,10 +1080,13 @@ html{scroll-padding-top:calc(var(--mast-h,58px) + 74px)}
 .wnums.armed.seen > *,.shelf.armed.seen > *{opacity:1;animation:rv-card .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 110ms)}
 .quiz.armed.seen > li{opacity:1;animation:rv-up .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 150ms)}
 
+/* '애니메이션 끄기'(윈도우 시각 효과 끔 등) 환경: 움직임(이동·확대)은 빼고, 차례로 서서히 나타나는 페이드만 남긴다 */
 @media (prefers-reduced-motion:reduce){
-  .armed *,.armed *::after{animation:none !important}
-  .pchat.armed li,.brief60.armed ol > li,.timeline.armed > li,.wnums.armed > *,.shelf.armed > *,.quiz.armed > li,.fig.armed text.v,.fig.armed .legend > span{opacity:1}
-  .fig.armed .mark{transform:none}
+  .armed.seen *{animation-name:rv-fade !important;animation-timing-function:ease-out !important}
+  .armed.seen .pc-body::after{display:none}
+  .fig.armed .mark{transform:none !important}
+  .fig.armed .mark{opacity:0}
+  .fig.armed.seen .mark{opacity:1}
 }
 
 /* ===== 퀴즈 카드: 간격을 넓히고 문항마다 타일 색을 살짝 다르게(흰 → 통 파랑 → 미 하늘) ===== */
