@@ -477,16 +477,16 @@ function renderAnalysis(f, older, newer) {
   <div class="layout">
     <div class="colmain">
       <section id="fq">
-        ${head("이번 주의 질문", "편집장이 던진 앵글")}
+        ${head("이번 주의 질문", "편집장의 시선")}
         <div class="card-art f-box">
-        <blockquote class="f-question"><p>${lines(f.question)}</p><cite>편집장 ${esc(f.note.by)}</cite></blockquote>
+        <blockquote class="f-question"><p>${lines(f.question)}</p><cite><span class="f-by">편집장 ${esc(f.note.by)}</span></cite></blockquote>
         ${f.layers && f.layers.length ? `<p class="f-intro">${lines("이 질문을 검증하기 위해 '고착화된 흥행 흐름'을 세 층으로 나눠 봤다.")}</p>
         <ol class="f-layers">${f.layers.map(([a, b]) => `<li><b>${esc(a)}</b><span>${esc(b)}</span></li>`).join("")}</ol>` : ""}
         </div>
       </section>
 
       ${f.timeline && f.timeline.length ? `<section id="ftime">
-        ${head("한눈에 보기", "무슨 일이 어떤 순서로 일어났나")}
+        ${head("한눈에 보기", "순서를 살피다")}
         <div class="card-art f-box">
         <ol class="f-timeline">${f.timeline.map(([d, t]) => `<li><span class="num">${esc(d)}</span><span>${esc(t)}</span></li>`).join("")}</ol>
         ${f.timelineNote ? `<p class="f-body">${lines(f.timelineNote)}</p>` : ""}
@@ -494,7 +494,7 @@ function renderAnalysis(f, older, newer) {
       </section>` : ""}
 
       <section id="ftest">
-        ${head("가설 검증", "지지하는 사실과 반대하는 사실을 나란히")}
+        ${head("가설 검증", "지지와 반대를 나란히")}
         ${f.tests.map((t, i) => `
         <article class="f-test card-art" id="ft${i}">
           <div class="f-test-head"><span class="label">${f.tests.length > 1 ? `층 ${i + 1}` : "검증"}</span><h3>${esc(t.title)}</h3><span class="st st-${VERDICT_CLS[t.verdict] || "none"}">${esc(t.verdict)}</span></div>
@@ -503,14 +503,14 @@ function renderAnalysis(f, older, newer) {
               <span class="f-pill" aria-hidden="true"></span>
               <button type="button" role="tab" class="f-tab" id="ft${i}-pro-t" aria-controls="ft${i}-pro" aria-selected="true" data-side="pro">${esc(t.proLabel || "지지하는 사실")}<span class="n">${t.pro.length}</span></button>
               <button type="button" role="tab" class="f-tab" id="ft${i}-con-t" aria-controls="ft${i}-con" aria-selected="false" tabindex="-1" data-side="con">${esc(t.conLabel || "반대하는 사실")}<span class="n">${t.con.length}</span></button>
-              <button type="button" role="tab" class="f-tab" id="ft${i}-judge-t" aria-controls="ft${i}-judge" aria-selected="false" tabindex="-1" data-side="judge">판정</button>
+              <button type="button" role="tab" class="f-tab" id="ft${i}-judge-t" aria-controls="ft${i}-judge" aria-selected="false" tabindex="-1" data-side="judge">판단</button>
             </div>
             <div class="f-pane f-pro" role="tabpanel" id="ft${i}-pro" aria-labelledby="ft${i}-pro-t"><ul>${t.pro.map((x, k) => `<li style="--i:${k}">${rich(x)}</li>`).join("")}</ul></div>
             <div class="f-pane f-con" role="tabpanel" id="ft${i}-con" aria-labelledby="ft${i}-con-t" hidden><ul>${t.con.map((x, k) => `<li style="--i:${k}">${rich(x)}</li>`).join("")}</ul></div>
-            <div class="f-pane f-judge" role="tabpanel" id="ft${i}-judge" aria-labelledby="ft${i}-judge-t" hidden><h4>판정 · ${esc(t.verdict)}</h4><p>${rich(t.judge)}</p></div>
+            <div class="f-pane f-judge" role="tabpanel" id="ft${i}-judge" aria-labelledby="ft${i}-judge-t" hidden><h4>판단 · ${esc(t.verdict)}</h4><p>${rich(t.judge)}</p></div>
           </div>
         </article>`).join("")}
-        <div class="f-verdict card"><span class="label">종합 판정</span><p>${lines(f.conclusion)}</p></div>
+        <div class="f-verdict card"><span class="label">종합 판단</span><p>${lines(f.conclusion)}</p></div>
       </section>
 
       ${f.money ? `<section id="fmoney">
@@ -524,7 +524,7 @@ function renderAnalysis(f, older, newer) {
       </section>` : ""}
 
       <section id="fplan">
-        ${head("전략기획가라면", "각자의 자리에서 다음 수")}
+        ${head("전략기획가라면", "다음 수를 봅니다")}
         <div class="card-art f-box">
         ${plannerChat(f.planner, sent)}
         ${f.questions && f.questions.length ? `<div class="f-questions"><h4>토론 질문</h4><ul>${f.questions.map(q => `<li>${esc(q)}</li>`).join("")}</ul></div>` : ""}
@@ -532,8 +532,8 @@ function renderAnalysis(f, older, newer) {
       </section>
 
       <section id="fnote">
-        ${head("편집장 노트", "이 회를 고른 사람의 시선")}
-        <div class="f-note card">${paras(f.note.text)}<p class="f-sign">— 편집장 ${esc(f.note.by)}</p></div>
+        ${head("편집장 노트", `${esc(f.note.by)}의 시선`)}
+        <div class="f-note card">${paras(f.note.text)}<p class="f-sign"><span class="f-by">편집장 ${esc(f.note.by)}</span></p></div>
       </section>
 
       <div class="card-art f-box f-end">

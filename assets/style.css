@@ -1095,3 +1095,15 @@ html{scroll-padding-top:calc(var(--mast-h,58px) + 74px)}
 .quiz > li:nth-child(3n+1){border-left-color:var(--hb-ink) !important}
 .quiz > li:nth-child(3n+2){background:color-mix(in srgb,#2b5c95 11%,var(--card));border-left-color:#2b5c95 !important}
 .quiz > li:nth-child(3n+3){background:color-mix(in srgb,#4b9cd6 15%,var(--card));border-left-color:#4b9cd6 !important}
+
+
+/* ===== 분석회: 편집장 목소리 카드(질문·노트)를 분석회 노랑 종이로 부각 ===== */
+:root{--an-paper:#fff4cc}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--an-paper:color-mix(in srgb,#ffe285 13%,var(--card))}}
+:root[data-theme="dark"]{--an-paper:color-mix(in srgb,#ffe285 13%,var(--card))}
+.an-page .f-box .f-question{margin:0 0 4px;padding:20px 24px 16px;border:var(--hb-w,2px) solid var(--hb-ink) !important;border-left:8px solid var(--an-line) !important;border-radius:14px;background:var(--an-paper);box-shadow:4px 4px 0 var(--hb-ink) !important}
+.an-page .f-note{background:var(--an-paper);border-left:8px solid var(--an-line) !important}
+.an-page .f-note p{color:var(--fg)}
+.f-question cite,.f-note .f-sign{text-align:right;max-width:none}
+.f-by{display:inline-block;padding:3px 12px;border:1.5px solid var(--hb-ink);border-radius:999px;background:var(--an-hl);color:var(--an-on);font-size:13px;font-weight:700;font-style:normal;box-shadow:2px 2px 0 var(--hb-ink)}
+@media (max-width:560px){.an-page .f-box .f-question{padding:16px 16px 14px}}
