@@ -878,9 +878,20 @@ section > .f-box{margin-top:22px}
 .pchat .pc-who{display:block;margin:1px 4px 5px;font-size:12.5px;font-weight:700;color:var(--muted)}
 .pchat .pc-bub{padding:12px 16px;border:1px solid var(--line);border-radius:4px 16px 16px 16px;background:var(--tile);font-size:15px;line-height:1.65;color:var(--fg)}
 .pchat .pc-bub span{color:inherit;font-size:inherit}
+/* 대화 등장: 아이콘이 톡 튀어나오고 → 점 세 개(입력 중) → 말풍선이 펼쳐진다. 한 사람당 0.75초 간격 */
 .pchat.armed li{opacity:0}
-.pchat.armed.seen li{animation:pc-in .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 220ms)}
-@keyframes pc-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+.pchat.armed.seen li{opacity:1;animation:pc-in .35s ease-out backwards;animation-delay:calc(var(--i) * 750ms)}
+.pchat.armed.seen .pc-ic{animation:pc-pop .45s cubic-bezier(.3,1.6,.5,1) backwards;animation-delay:calc(var(--i) * 750ms)}
+.pchat .pc-body{position:relative}
+.pchat.armed.seen .pc-bub{animation:pc-bub .45s cubic-bezier(.2,.9,.25,1.15) backwards;animation-delay:calc(var(--i) * 750ms + 420ms);transform-origin:0 0}
+.pchat.armed.seen li:nth-child(even) .pc-bub{transform-origin:100% 0}
+.pchat.armed.seen .pc-body::after{content:"•••";position:absolute;left:4px;top:26px;padding:0 12px;height:30px;border:1px solid var(--line);border-radius:15px;background:var(--tile);color:var(--muted);font-size:15px;line-height:30px;letter-spacing:3px;opacity:0;pointer-events:none;animation:pc-typing .42s steps(1,end) backwards;animation-delay:calc(var(--i) * 750ms + 10ms)}
+.pchat.armed.seen li:nth-child(even) .pc-body::after{left:auto;right:4px}
+@media (max-width:560px){.pchat.armed.seen li:nth-child(even) .pc-body::after{left:4px;right:auto}.pchat.armed.seen li:nth-child(even) .pc-bub{transform-origin:0 0}}
+@keyframes pc-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pc-pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+@keyframes pc-bub{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@keyframes pc-typing{0%{opacity:1}100%{opacity:0}}
 @media (max-width:560px){
   .planner.pchat li,.planner.pchat li:nth-child(even){grid-template-columns:34px minmax(0,1fr);gap:10px}
   .planner.pchat li:nth-child(even) .pc-ic{order:0}
@@ -889,7 +900,7 @@ section > .f-box{margin-top:22px}
   .pchat .pc-ic{width:34px;height:34px}.pchat .pc-ic svg{width:18px;height:18px}
   .pchat .pc-bub{padding:11px 14px}
 }
-@media (prefers-reduced-motion:reduce){.pchat.armed li{opacity:1}.pchat.armed.seen li{animation:none}}
+
 
 /* ===== 월요 콘텐츠 분석회: 별판 색(따뜻한 노랑 #ffe285). 노랑은 면(알약·카드·아이콘)에만, 글자는 짙은 호박색으로 대비 확보 ===== */
 :root{--an-hl:#ffe285;--an-ink:#7a5300;--an-line:#e2b23a;--an-on:#3d2c00}
@@ -1039,3 +1050,45 @@ html{scroll-padding-top:calc(var(--mast-h,58px) + 74px)}
 /* 고정 메뉴 아래로 다른 고정 요소(목차·지도 카드·위클리 카드)를 내려서 겹치지 않게 */
 .rail .toc-card,.m-card,.ar-wk{top:calc(var(--mast-h,58px) + 72px + env(safe-area-inset-top,0px)) !important}
 @media (max-width:900px){.m-card{top:auto !important}}
+
+
+/* ===== 스크롤 등장 모션: 화면에 들어올 때 한 번만. 끝나면 원래 상태(호버 등)로 돌아가도록 backwards만 쓴다 ===== */
+/* 차트: 막대는 왼쪽에서 자라고, 값은 뒤따라 뜨고, 점은 톡 떨어진다 */
+.fig.armed .chart svg .mark{transform-box:fill-box}
+.fig.armed rect.mark,.fig.armed path.mark{transform-origin:0 50%;transform:scaleX(0)}
+.fig.armed circle.mark{transform-origin:50% 50%;transform:scale(0)}
+.fig.armed text.v,.fig.armed .legend > span{opacity:0}
+.fig.armed.seen rect.mark,.fig.armed.seen path.mark{transform:none;animation:rv-grow .8s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 110ms + 100ms)}
+.fig.armed.seen circle.mark{transform:none;animation:rv-pop .5s cubic-bezier(.3,1.7,.5,1) backwards;animation-delay:calc(var(--i,0) * 120ms + 150ms)}
+.fig.armed.seen text.v{opacity:1;animation:rv-fade .4s ease-out backwards;animation-delay:calc(var(--i,0) * 110ms + 600ms)}
+.fig.armed.seen .legend > span{opacity:1;animation:rv-up .4s ease-out backwards;animation-delay:calc(var(--i,0) * 90ms + 500ms)}
+@keyframes rv-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes rv-pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+@keyframes rv-fade{from{opacity:0}to{opacity:1}}
+@keyframes rv-up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes rv-left{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+@keyframes rv-card{from{opacity:0;transform:translate(10px,14px)}to{opacity:1;transform:none}}
+
+/* 3줄 요약·60초 브리핑: 한 줄씩 */
+.brief60.armed ol > li{opacity:0}
+.brief60.armed.seen ol > li{opacity:1;animation:rv-left .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 140ms + 80ms)}
+/* 위클리 타임라인: 날짜순으로 하나씩 */
+.timeline.armed > li{opacity:0}
+.timeline.armed.seen > li{opacity:1;animation:rv-left .45s ease-out backwards;animation-delay:calc(var(--i,0) * 90ms)}
+/* 숫자 카드·움직인 숫자·퀴즈 카드: 아래에서 차례로 */
+.wnums.armed > *,.shelf.armed > *,.quiz.armed > li{opacity:0}
+.wnums.armed.seen > *,.shelf.armed.seen > *{opacity:1;animation:rv-card .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 110ms)}
+.quiz.armed.seen > li{opacity:1;animation:rv-up .5s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 150ms)}
+
+@media (prefers-reduced-motion:reduce){
+  .armed *,.armed *::after{animation:none !important}
+  .pchat.armed li,.brief60.armed ol > li,.timeline.armed > li,.wnums.armed > *,.shelf.armed > *,.quiz.armed > li,.fig.armed text.v,.fig.armed .legend > span{opacity:1}
+  .fig.armed .mark{transform:none}
+}
+
+/* ===== 퀴즈 카드: 간격을 넓히고 문항마다 타일 색을 살짝 다르게(흰 → 통 파랑 → 미 하늘) ===== */
+.quiz{gap:26px}
+.qz{position:relative;border-left-width:6px !important}
+.quiz > li:nth-child(3n+1){border-left-color:var(--hb-ink) !important}
+.quiz > li:nth-child(3n+2){background:color-mix(in srgb,#2b5c95 11%,var(--card));border-left-color:#2b5c95 !important}
+.quiz > li:nth-child(3n+3){background:color-mix(in srgb,#4b9cd6 15%,var(--card));border-left-color:#4b9cd6 !important}

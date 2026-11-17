@@ -119,7 +119,7 @@ async function share(btn) {
 
 /* ---------- sections ---------- */
 // 두 톤 섹션 제목: "리드 스토리. 오늘 가장 깊게 볼 이슈."
-const head = (title, sub) => `<div class="section-head"><h2><b>${title}.</b> <span>${sub}</span></h2></div>`;
+const head = (title, sub) => `<div class="section-head"><h2><b>${title}.</b>${sub ? ` <span>${sub}</span>` : ""}</h2></div>`;
 function brief(b, id, kl = "국내 시사점") {
   return `<article class="brief card-art" id="${id}">
     ${chips(b)}
@@ -263,7 +263,7 @@ function renderIssue(d, market, older, newer) {
       </section>
       ${section("kr", "국내 브리핑", "산업 시사점까지", d.kr, "k", "산업 시사점")}
       ${section("global", "글로벌 브리핑", "국내 시사점도 함께", d.global, "g", "국내 시사점")}
-      ${d.figures && d.figures.length ? `<section id="numbers">${head("숫자로 보는 산업", "오늘 기사 속 수치를 한눈에")}${d.figures.map(f => figure(f)).join("")}</section>` : ""}
+      ${d.figures && d.figures.length ? `<section id="numbers">${head("숫자로 보는 산업", "기사 속 수치 살펴보기")}${d.figures.map(f => figure(f)).join("")}</section>` : ""}
       ${quizSection(d)}
       ${d.calendar && d.calendar.length ? `<section class="only-mob" aria-label="다가오는 일정">${head("다가오는 일정", "이번 달 챙길 날짜")}<div class="cal card">${calList(d)}</div></section>` : ""}
       ${market && market.updated ? `<div class="only-mob mob-market">${marketPanel(market)}</div>` : ""}
@@ -363,7 +363,7 @@ function renderWeekly(w, older, newer, issues) {
     .concat([["다음 주", "#wnext", "다음 주 볼 것"]]);
   return `
   <div class="edition weekly-edition">
-    <p class="kicker num">WEEKLY REPORT · ${span(w)} · 위클리 ${esc(w.vol)}호 · ${esc(w.readMin || 5)}분 읽기</p>
+    <p class="kicker num">WEEKLY REPORT · ${span(w)} · 위클리 ${esc(w.vol)}호</p>
     <h1>${twoTone(w.headline)}</h1>
     <nav class="meta" aria-label="위클리 이동">
       ${older ? `<a class="more back" href="?w=${esc(older.id)}" rel="prev">이전 위클리 ${span(older)}</a>` : `<span class="off">첫 위클리입니다</span>`}
@@ -383,7 +383,7 @@ function renderWeekly(w, older, newer, issues) {
   <div class="layout">
     <div class="colmain">
       <section id="wthreads">
-        ${head("이번 주의 흐름", `여러 날에 걸쳐 이어진 이야기 ${w.threads.length}개`)}
+        ${head("이번 주의 흐름")}
         ${w.threads.map((t, i) => `
         <article class="thread card-art" id="t${i}">
           <div class="chips">${axisBadge(t.axis)}<span class="num">${t.timeline.length}건 · ${md(t.timeline[0][0].slice(0, 10))}–${md(t.timeline[t.timeline.length - 1][0].slice(0, 10))}</span></div>
@@ -397,7 +397,7 @@ function renderWeekly(w, older, newer, issues) {
       </section>
 
       <section id="wnum">
-        ${head("숫자로 본 한 주", "숫자를 누르면 원래 기사로 갑니다")}
+        ${head("숫자로 본 한 주")}
         <div class="wnums">${w.numbers.map(x => `
           <a class="wnum" href="${refHref(x.ref)}">
             <b class="num">${esc(x.value)}</b>
@@ -408,7 +408,7 @@ function renderWeekly(w, older, newer, issues) {
       </section>
 
       ${w.checkback && w.checkback.length ? `<section id="wcheck">
-        ${head("예고했던 일정, 실제로는", "매일 호 '다가오는 일정'에 적었던 것")}
+        ${head("예고했던 일정, 실제로는")}
         <ul class="checkback card">${w.checkback.map(c => `
           <li>
             ${calWhen(c.when, w.from)}
@@ -418,7 +418,7 @@ function renderWeekly(w, older, newer, issues) {
       </section>` : ""}
 
       <section id="wnext">
-        ${head("다음 주 볼 것", "일정과 관전 포인트")}
+        ${head("다음 주 볼 것")}
         <ul class="wnext card">${w.next.map(([when, what, pt]) => `
           <li>${calWhen(when, w.id)}<div><b>${esc(what)}</b><p>${sent(pt)}</p></div></li>`).join("")}</ul>
       </section>
@@ -850,12 +850,41 @@ const plannerChat = (rows, fmt) => !rows || !rows.length ? "" : `
   <div class="planner pchat"><span class="label">내가 전략기획자라면</span>
     <ol>${rows.map(([a, b, ic], i) => `<li style="--i:${i}">${roleIcon(a, ic)}<div class="pc-body"><b class="pc-who">${esc(a)}</b><div class="pc-bub">${fmt(b)}</div></div></li>`).join("")}</ol>
   </div>`;
-// 화면에 들어오면 말풍선이 차례로 떠오른다
+// 화면에 들어오면 움직인다: 대화 말풍선, 차트 막대, 3줄 요약, 타임라인, 숫자 카드, 퀴즈
+const REVEAL = ".pchat, .fig, .brief60, .timeline, .wnums, .quiz, .shelf";
 function watchChat() {
-  const els = document.querySelectorAll(".pchat:not(.seen)");
-  if (!("IntersectionObserver" in window)) { els.forEach(e => e.classList.add("seen")); return; }
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("seen"); io.unobserve(e.target); } }), { rootMargin: "0px 0px -15% 0px" });
-  els.forEach(e => { e.classList.add("armed"); io.observe(e); });
+  const els = [...document.querySelectorAll(REVEAL)].filter(e => !e.classList.contains("armed"));
+  if (!els.length) return;
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce || !("IntersectionObserver" in window)) return;
+  // 차트 안 요소마다 순번을 붙여 차례로 그려지게 한다
+  els.forEach(e => {
+    if (e.classList.contains("fig")) {
+      e.querySelectorAll("svg .mark").forEach((m, i) => m.style.setProperty("--i", i));
+      e.querySelectorAll("svg text.v").forEach((m, i) => m.style.setProperty("--i", i));
+      e.querySelectorAll(".legend > span").forEach((m, i) => m.style.setProperty("--i", i));
+    } else if (!e.classList.contains("pchat")) {
+      [...e.children].forEach((c, i) => c.style.setProperty("--i", i));
+      e.querySelectorAll(":scope > ol > li").forEach((c, i) => c.style.setProperty("--i", i));
+    }
+  });
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add("seen"); io.unobserve(e.target); }
+  }), { rootMargin: "0px 0px -12% 0px" });
+  els.forEach(e => {
+    // 이미 화면 위쪽으로 지나간 요소는 그대로 보여 준다(앵커로 점프했을 때)
+    const r = e.getBoundingClientRect();
+    if (r.bottom < 0) return;
+    e.classList.add("armed"); io.observe(e);
+  });
+  // 페이지 맨 끝에 붙은 요소는 여백 기준선에 닿지 못할 수 있어, 끝까지 내리면 전부 보여 준다
+  if (!watchChat.end) {
+    watchChat.end = true;
+    addEventListener("scroll", () => {
+      if (innerHeight + scrollY >= document.documentElement.scrollHeight - 8)
+        document.querySelectorAll(".armed:not(.seen)").forEach(e => e.classList.add("seen"));
+    }, { passive: true });
+  }
 }
 
 function watchToc() {
