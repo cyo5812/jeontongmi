@@ -99,7 +99,9 @@ let CURRENT = ""; // "d=2026-10-28" 또는 "w=2026-11-02"
 const SHARE_ICON = `<svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true"><path d="M8 11.5 12 7.5M7 6.5l1.5-1.5a3.2 3.2 0 0 1 4.5 4.5L11.5 11M13 13.5 11.5 15a3.2 3.2 0 0 1-4.5-4.5L8.5 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
 const shareBtn = (id, title, label = "링크 공유") =>
   `<button type="button" class="share" data-share="${id}" data-title="${esc(title)}">${SHARE_ICON}<span>${label}</span></button>`;
-const shareUrl = id => `${location.origin}${location.pathname}?${CURRENT}${id ? "#" + id : ""}`;
+// 공유 링크는 항상 공식 주소로 만든다(오프라인 HTML 파일·사내 미리보기 등에서 열어도 남이 열 수 있는 링크가 되게)
+const SITE = "https://jeontongmi.kro.kr/";
+const shareUrl = id => `${/^https?:$/.test(location.protocol) && !/localhost|127\.0\.0\.1/.test(location.host) ? location.origin + location.pathname : SITE}?${CURRENT}${id ? "#" + id : ""}`;
 
 let toastTimer;
 function toast(msg) {
