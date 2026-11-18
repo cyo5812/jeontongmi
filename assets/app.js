@@ -113,8 +113,35 @@ async function share(btn) {
   if (navigator.share && matchMedia("(pointer:coarse)").matches) {
     try { await navigator.share({ title, url }); return; } catch (e) { if (e.name === "AbortError") return; }
   }
-  try { await navigator.clipboard.writeText(url); toast("링크를 복사했어요"); }
-  catch (e) { toast(url); }
+  if (await copyText(url)) toast("링크를 복사했어요");
+  else manualCopy(url);
+}
+// 복사는 3단계로 시도한다: 최신 클립보드 API → 옛 방식(execCommand) → 직접 복사 창
+async function copyText(text) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+  } catch (e) { /* 권한·포커스·iframe 제한 등으로 실패하면 옛 방식으로 */ }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:0;left:0;width:1px;height:1px;opacity:0";
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand("copy"); ta.remove(); return ok;
+  } catch (e) { return false; }
+}
+// 브라우저가 복사를 막으면 링크를 선택된 상태로 띄워 Ctrl+C 한 번이면 되게 한다
+function manualCopy(text) {
+  let box = document.getElementById("copybox");
+  if (!box) {
+    box = document.createElement("div"); box.id = "copybox"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "링크 복사");
+    box.innerHTML = `<p>이 브라우저는 자동 복사를 막고 있어요. <b>Ctrl+C</b>(맥은 ⌘+C)로 복사해 주세요.</p><input type="text" readonly><button type="button" class="cb-close" aria-label="닫기">닫기</button>`;
+    document.body.appendChild(box);
+    box.querySelector(".cb-close").addEventListener("click", () => { box.hidden = true; });
+    box.querySelector("input").addEventListener("copy", () => setTimeout(() => { box.hidden = true; toast("링크를 복사했어요"); }, 50));
+    document.addEventListener("keydown", e => { if (e.key === "Escape") box.hidden = true; });
+  }
+  const inp = box.querySelector("input");
+  inp.value = text; box.hidden = false; inp.focus(); inp.select();
 }
 
 /* ---------- sections ---------- */

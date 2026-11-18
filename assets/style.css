@@ -1107,3 +1107,11 @@ html{scroll-padding-top:calc(var(--mast-h,58px) + 74px)}
 .f-question cite,.f-note .f-sign{text-align:right;max-width:none}
 .f-by{display:inline-block;padding:3px 12px;border:1.5px solid var(--hb-ink);border-radius:999px;background:var(--an-hl);color:var(--an-on);font-size:13px;font-weight:700;font-style:normal;box-shadow:2px 2px 0 var(--hb-ink)}
 @media (max-width:560px){.an-page .f-box .f-question{padding:16px 16px 14px}}
+
+
+/* ===== 자동 복사가 막힌 브라우저용 직접 복사 창 ===== */
+#copybox{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;width:min(560px,calc(100vw - 24px));padding:16px 18px;border:2px solid var(--hb-ink);border-radius:14px;background:var(--card);box-shadow:4px 4px 0 var(--hb-ink);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
+#copybox[hidden]{display:none}
+#copybox p{grid-column:1/-1;margin:0;font-size:14px;color:var(--sub)}
+#copybox input{min-width:0;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font:inherit;font-size:14px}
+#copybox .cb-close{padding:9px 14px;border:1.5px solid var(--hb-ink);border-radius:10px;background:var(--tile);color:var(--fg);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
