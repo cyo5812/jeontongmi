@@ -111,13 +111,102 @@ function toast(msg) {
 }
 async function share(btn) {
   const url = shareUrl(btn.dataset.share), title = `${btn.dataset.title} · 전.통.미.`;
-  // 휴대폰은 기기 공유창(카카오톡·메시지 등), 그 외에는 링크 복사
+  // 휴대폰은 기기 공유창(카카오톡·메시지 등)
   if (navigator.share && matchMedia("(pointer:coarse)").matches) {
     try { await navigator.share({ title, url }); return; } catch (e) { if (e.name === "AbortError") return; }
   }
-  if (await copyText(url)) toast("링크를 복사했어요");
-  else manualCopy(url);
+  // PC는 작은 메뉴: 링크만 / 요약과 함께 (같은 버튼을 다시 누르면 닫힘)
+  const open = document.getElementById("sharemenu");
+  if (open && open._btn === btn) { closeShareMenu(); return; }
+  openShareMenu(btn, url);
 }
+
+/* ---------- 공유 문구: 화면에 그려진 내용에서 바로 뽑는다(일간·위클리·분석회·지도 공통) ---------- */
+// 문장마다 줄을 나눠 그린 곳은 textContent로 붙어 나오므로 "다.다음"처럼 붙은 자리에 띄어쓰기를 되살린다
+const clean = t => String(t || "").replace(/([다요]\.)(?=[^\s.])/g, "$1 ").replace(/\s+/g, " ").trim();
+// 첫 문장만, 너무 길면 말줄임
+function firstSentence(t, max = 80) {
+  t = clean(t);
+  const m = t.match(/^.*?[다요]\.(?=\s|$)/);
+  t = m ? m[0] : t;
+  if (t.length <= max) return t;
+  // 숫자·단어 중간에서 끊지 않도록 마지막 띄어쓰기에서 자른다
+  const cut = t.slice(0, max - 1), sp = cut.lastIndexOf(" ");
+  return (sp > max * 0.6 ? cut.slice(0, sp) : cut).replace(/[,·\s]+$/, "") + "…";
+}
+function shareTag() {
+  const [k, v = ""] = CURRENT.split("=");
+  const md = v.slice(5).replace("-", ".");
+  if (k === "d") return `전.통.미. ${md}`;
+  if (k === "w") return `전.통.미. 위클리 · ${md} 주`;
+  if (k === "a") return "전.통.미. 월요 콘텐츠 분석회";
+  if (k === "map") return "전.통.미. 산업 지도";
+  return "전.통.미.";
+}
+const CARD_KIND = { lead: "리드 스토리", k: "국내 브리핑", g: "글로벌 브리핑", t: "이번 주의 흐름" };
+function shareText(btn, url) {
+  const id = btn.dataset.share;
+  let label = "", title = "", lines = [];
+  if (!id) {
+    // 호 전체: 헤드라인 + 3줄 요약
+    const card = btn.closest(".m-card");
+    if (card) {
+      title = clean(btn.dataset.title.replace(/ · 산업 지도$/, ""));
+      const p = card.querySelector("p"); if (p) lines = [firstSentence(p.textContent, 90)];
+    } else {
+      title = clean(document.querySelector("main h1, h1")?.textContent);
+      lines = [...document.querySelectorAll(".brief60 ol > li")].slice(0, 3).map(li => firstSentence(li.textContent, 110));
+    }
+  } else {
+    // 카드 하나: 어느 코너인지 + 카드 제목 + 한 줄
+    const card = document.getElementById(id);
+    label = CARD_KIND[id] || CARD_KIND[id.replace(/\d+$/, "")] || "";
+    title = clean(card?.querySelector("h3")?.textContent || btn.dataset.title);
+    const p = card?.querySelector(".dek, h3 ~ p");
+    if (p) lines = [firstSentence(p.textContent, 90)];
+  }
+  return [`[${shareTag()}${label ? " · " + label : ""}]`, title, ...lines.map(l => "· " + l), url].filter(Boolean).join("\n");
+}
+
+function openShareMenu(btn, url) {
+  closeShareMenu();
+  const text = shareText(btn, url);
+  const m = document.createElement("div");
+  m.id = "sharemenu"; m.setAttribute("role", "menu");
+  m.innerHTML = `
+    <button type="button" role="menuitem" data-copy="full"><b>요약과 함께 복사</b><small>메신저·메일에 바로 붙이기 좋아요</small></button>
+    <pre class="sm-preview" aria-label="복사될 문구">${esc(text)}</pre>
+    <button type="button" role="menuitem" data-copy="url"><b>링크만 복사</b><small>${esc(url.replace(/^https?:\/\//, ""))}</small></button>`;
+  document.body.appendChild(m);
+  // 버튼 바로 아래(공간이 없으면 위)에 붙인다
+  const r = btn.getBoundingClientRect(), w = m.offsetWidth, h = m.offsetHeight;
+  const left = Math.max(12, Math.min(r.left + scrollX, scrollX + innerWidth - w - 12));
+  const below = r.bottom + 8 + h < innerHeight;
+  m.style.left = left + "px";
+  m.style.top = (below ? r.bottom + 8 : r.top - h - 8) + scrollY + "px";
+  btn.setAttribute("aria-expanded", "true");
+  m._btn = btn;
+  m.addEventListener("click", async e => {
+    const it = e.target.closest("[data-copy]"); if (!it) return;
+    const val = it.dataset.copy === "url" ? url : text;
+    closeShareMenu(true);
+    if (await copyText(val)) toast(it.dataset.copy === "url" ? "링크를 복사했어요" : "요약과 링크를 복사했어요");
+    else manualCopy(val);
+  });
+  m.querySelector("[data-copy]").focus();
+}
+function closeShareMenu(refocus) {
+  const m = document.getElementById("sharemenu"); if (!m) return;
+  m._btn?.setAttribute("aria-expanded", "false");
+  if (refocus) m._btn?.focus();
+  m.remove();
+}
+document.addEventListener("pointerdown", e => {
+  if (!e.target.closest("#sharemenu, [data-share]")) closeShareMenu();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeShareMenu(true); });
+addEventListener("resize", () => closeShareMenu());
+
 // 복사는 3단계로 시도한다: 최신 클립보드 API → 옛 방식(execCommand) → 직접 복사 창
 async function copyText(text) {
   try {
@@ -136,13 +225,14 @@ function manualCopy(text) {
   let box = document.getElementById("copybox");
   if (!box) {
     box = document.createElement("div"); box.id = "copybox"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "링크 복사");
-    box.innerHTML = `<p>이 브라우저는 자동 복사를 막고 있어요. <b>Ctrl+C</b>(맥은 ⌘+C)로 복사해 주세요.</p><input type="text" readonly><button type="button" class="cb-close" aria-label="닫기">닫기</button>`;
+    box.innerHTML = `<p>이 브라우저는 자동 복사를 막고 있어요. <b>Ctrl+C</b>(맥은 ⌘+C)로 복사해 주세요.</p><textarea readonly rows="3"></textarea><button type="button" class="cb-close" aria-label="닫기">닫기</button>`;
     document.body.appendChild(box);
     box.querySelector(".cb-close").addEventListener("click", () => { box.hidden = true; });
-    box.querySelector("input").addEventListener("copy", () => setTimeout(() => { box.hidden = true; toast("링크를 복사했어요"); }, 50));
+    box.querySelector("textarea").addEventListener("copy", () => setTimeout(() => { box.hidden = true; toast("링크를 복사했어요"); }, 50));
     document.addEventListener("keydown", e => { if (e.key === "Escape") box.hidden = true; });
   }
-  const inp = box.querySelector("input");
+  const inp = box.querySelector("textarea");
+  inp.rows = Math.min(6, text.split("\n").length);
   inp.value = text; box.hidden = false; inp.focus(); inp.select();
 }
 

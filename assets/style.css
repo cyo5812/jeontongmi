@@ -1113,5 +1113,16 @@ html{scroll-padding-top:calc(var(--mast-h,58px) + 74px)}
 #copybox{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;width:min(560px,calc(100vw - 24px));padding:16px 18px;border:2px solid var(--hb-ink);border-radius:14px;background:var(--card);box-shadow:4px 4px 0 var(--hb-ink);display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
 #copybox[hidden]{display:none}
 #copybox p{grid-column:1/-1;margin:0;font-size:14px;color:var(--sub)}
-#copybox input{min-width:0;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font:inherit;font-size:14px}
+#copybox textarea{resize:none;line-height:1.5;min-width:0;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);font:inherit;font-size:14px}
 #copybox .cb-close{padding:9px 14px;border:1.5px solid var(--hb-ink);border-radius:10px;background:var(--tile);color:var(--fg);font:inherit;font-size:14px;font-weight:700;cursor:pointer}
+
+
+/* ===== PC 공유 메뉴: 요약과 함께 / 링크만 ===== */
+#sharemenu{position:absolute;z-index:190;width:min(380px,calc(100vw - 24px));padding:8px;border:2px solid var(--hb-ink);border-radius:14px;background:var(--card);box-shadow:4px 4px 0 var(--hb-ink);display:grid;gap:6px;animation:sm-in .16s ease-out}
+@keyframes sm-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#sharemenu{animation:none}}
+#sharemenu button{display:grid;gap:2px;text-align:left;padding:10px 12px;border:0;border-radius:10px;background:transparent;color:var(--fg);font:inherit;cursor:pointer}
+#sharemenu button:hover,#sharemenu button:focus-visible{background:var(--accent-soft);outline:none}
+#sharemenu button b{font-size:14px}
+#sharemenu button small{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sharemenu .sm-preview{margin:0 4px;padding:10px 12px;border-radius:10px;background:var(--bg);color:var(--sub);font:inherit;font-size:12.5px;line-height:1.6;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;max-height:168px;overflow:auto}
