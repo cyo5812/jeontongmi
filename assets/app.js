@@ -599,7 +599,7 @@ function renderAnalysis(f, older, newer) {
         ${head("이번 주의 질문", "편집장의 시선")}
         <div class="card-art f-box">
         <blockquote class="f-question"><p>${lines(f.question)}</p><cite><span class="f-by">편집장 ${esc(f.note.by)}</span></cite></blockquote>
-        ${f.layers && f.layers.length ? `<p class="f-intro">${lines("이 질문을 검증하기 위해 '고착화된 흥행 흐름'을 세 층으로 나눠 봤다.")}</p>
+        ${f.layers && f.layers.length ? `<p class="f-intro">${lines(f.layersIntro || "이 질문을 몇 개의 층으로 나눠 검증했다.")}</p>
         <ol class="f-layers">${f.layers.map(([a, b]) => `<li><b>${esc(a)}</b><span>${esc(b)}</span></li>`).join("")}</ol>` : ""}
         </div>
       </section>
@@ -635,7 +635,7 @@ function renderAnalysis(f, older, newer) {
       ${f.money ? `<section id="fmoney">
         ${head("돈은 어디로 가나", "권리와 수익의 흐름")}
         <div class="card-art f-box">
-        ${f.money.rows && f.money.rows.length ? `<div class="f-table"><table><thead><tr><th>권리·수익</th><th>누구에게</th><th>확인 수준</th></tr></thead><tbody>${f.money.rows.map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td><span class="st st-${c === "미확인" ? "none" : c === "보도로 확인" ? "ok" : "wait"}">${esc(c)}</span></td></tr>`).join("")}</tbody></table></div>` : ""}
+        ${f.money.rows && f.money.rows.length ? `<div class="f-table"><table><thead><tr>${(f.money.head || ["권리·수익", "누구에게", "확인 수준"]).map(h => `<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${f.money.rows.map(([a, b, c]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td><td><span class="st st-${c === "미확인" ? "none" : c === "보도로 확인" ? "ok" : "wait"}">${esc(c)}</span></td></tr>`).join("")}</tbody></table></div>` : ""}
         ${f.money.body ? `<p class="f-body">${lines(f.money.body)}</p>` : ""}
         ${f.money.compare ? `<p class="f-body">${lines(f.money.compare)}</p>` : ""}
         ${f.money.take ? `<p class="lens f-take"><b>우리 해석</b>${sent(f.money.take)}</p>` : ""}

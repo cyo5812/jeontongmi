@@ -47,7 +47,7 @@ layers[[층 이름, 설명]](선택),
 timeline[[날짜, 일어난 일]](선택), timelineNote(선택),
 tests[{title, verdict, pro[], con[], proLabel?, conLabel?, judge}],
 conclusion,
-money{rows[[권리·수익, 누구에게, 확인 수준]], body, compare, take}(선택),
+money{head?[3칸 제목], rows[[3칸]], body, compare, take}(선택), layersIntro(선택),
 planner[[대상, 다음 수]], questions[](선택),
 note{by: "Mday"(편집장 표기는 항상 Mday), text}(문단은 빈 줄로 나눈다), unknown[](선택), src[[이름, 주소]]
 ```
